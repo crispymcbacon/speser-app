@@ -3,6 +3,7 @@ import express from 'express';
 import { authenticateToken } from './utils.js';
 
 import { 
+  validateRegistration,
   registerUser,
   loginUser,
   getUserExpenses,
@@ -16,13 +17,14 @@ import {
   getUserBalanceWithId,
   searchExpenses,
   getAuthUser,
-  searchUsers
+  searchUsers,
+  getCategories
 } from './controllers/budgetController.js';
 
 const router = express.Router();
 
 // Authentication and user registration
-router.post('/auth/signup', registerUser);
+router.post('/auth/signup', validateRegistration(), registerUser);
 router.post('/auth/signin', loginUser);
 
 // Add authentication middleware to all routes below
@@ -45,6 +47,9 @@ router.delete('/budget/:year/:month/:id', deleteUserExpense);
 // API for personal balance and details
 router.get('/balance', getUserBalance);
 router.get('/balance/:id', getUserBalanceWithId);
+
+// API for categories
+router.get('/categories', getCategories);
 
 
 export default router;

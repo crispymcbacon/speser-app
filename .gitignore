@@ -6,6 +6,8 @@
 /db
 *.rest
 
+hashpassword.js
+
 # Logs
 logs
 *.log
