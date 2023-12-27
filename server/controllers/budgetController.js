@@ -178,6 +178,7 @@ export const getUserExpensesByYearMonthId = async (req, res) => {
 
 export const addUserExpense = async (req, res) => {
   try {
+    const logged_user_id = req.user_id // Get the user ID from the request
     const { year, month } = req.params
     const { user_id, description, category_id, total_cost, users } = req.body
 
@@ -193,14 +194,19 @@ export const addUserExpense = async (req, res) => {
     // Get the id of the inserted expense
     const expense_id = result.rows[0].id
 
-    console.log(users)
-
     if (users && users.length > 0) {
       // Calculate the sum of all shares
-      const totalShares = users.reduce((sum, user) => sum + user.share, 0)
+      const totalShares = users.reduce((sum, user) => sum + parseFloat(user.share), 0)
 
-      // Check if the sum of all shares equals the total_cost
-      if (totalShares !== total_cost) {
+      // Define an acceptable error margin
+      const epsilon = 0.01
+
+      console.log(totalShares)
+
+      console.log(Math.abs(totalShares - parseFloat(total_cost)))
+
+      // Compare the sum of shares with the total cost
+      if (Math.abs(totalShares - parseFloat(total_cost)) > epsilon) {
         return res.status(400).json({ message: 'The sum of all shares must equal the total cost.' })
       }
 
@@ -208,6 +214,11 @@ export const addUserExpense = async (req, res) => {
       for (let user of users) {
         // convert user_id to integer
         user.user_id = parseInt(user.user_id, 10)
+
+        // If the user is not the logged user, make the share negative
+        if (user.user_id !== logged_user_id) {
+          user.share = user.share * -1;
+        }
         await db.query(
           'INSERT INTO expense_shares (expense_id, user_id, share) VALUES ($1, $2, $3)',
           [expense_id, user.user_id, user.share]
@@ -288,8 +299,9 @@ export const getUserBalance = async (req, res) => {
       JOIN 
         expense_shares es ON e.id = es.expense_id
       WHERE 
-        e.user_id = $1 OR es.user_id = $1;
+         es.user_id = $1;
     `
+    // e.user_id = $1 OR es.user_id = $1; OLD QUERY
 
     const result = await db.query(query, [user_id])
     const expenses = result.rows // Get the expenses from the query result
@@ -299,8 +311,8 @@ export const getUserBalance = async (req, res) => {
 
     // Convert the balance to a debit or credit
     expenses.forEach((expense) => {
-      // Ensure expense.balance is an integer
-      expense.balance = parseInt(expense.balance, 10)
+      // Ensure expense.balance is a float
+      expense.balance = parseFloat(expense.balance)
 
       // If expense.balance is NaN after parseInt (which means it was not a number to begin with), set it to 0
       if (isNaN(expense.balance)) {
@@ -312,11 +324,17 @@ export const getUserBalance = async (req, res) => {
         if (expense.balance > 0 && expense.balance < expense.total_cost) {
           creditBalance += expense.balance
           expense.balance = `Credit: ${expense.balance}`
+        } else if (expense.balance < 0) {
+          debitBalance += expense.balance // REFUND
+          expense.balance = `Refund Paid: ${-expense.balance}`
         }
       } else {
         if (expense.balance > 0) {
           debitBalance += expense.balance
           expense.balance = `Debit: ${expense.balance}`
+        } else if (expense.balance < 0) {
+          creditBalance += expense.balance // REFUND
+          expense.balance = `Refund Received: ${-expense.balance}`
         }
       }
     })

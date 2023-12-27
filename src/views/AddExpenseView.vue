@@ -120,6 +120,7 @@
                   <input
                     class="input input-bordered w-full"
                     type="number"
+                    step="0.01"
                     v-model="user.share"
                     :readonly="shareEqually"
                     :disabled="isRefund && index === 0"
@@ -166,7 +167,7 @@
 </template>
 
 <script setup>
-import { ref, defineEmits, computed, onMounted, watch } from 'vue'
+import { ref, defineEmits, onMounted, watch } from 'vue'
 import { addExpense } from '../lib/api.js'
 import { useToast } from 'vue-toastification'
 import { useUserStore } from '../lib/stores.js'
@@ -212,33 +213,32 @@ const openDialog = () => {
   isDialogOpen.value = true
 }
 
-// Create a computed property to calculate the share for each user
-const userShare = computed(() => {
-  if (shareEqually.value && total_cost.value && users.value.length > 0) {
-    return (total_cost.value / users.value.length).toFixed(2)
-  } else if (isRefund.value && !shareEqually.value && users.value.length > 0) {
-    let sum = 0
-    for (let i = 0; i < users.value.length; i++) {
-      sum += i === 0 ? -users.value[i].share : users.value[i].share
-    }
-    return sum.toFixed(2)
-  }
-  return 0
-})
-
-// Watch for changes in users array and total_cost value
+// Watch for changes in users array, isRefund, and shareEqually
 watch(
-  [users, total_cost, shareEqually],
-  () => {
-    if (shareEqually.value) {
-      const equalShare = (total_cost.value / users.value.length).toFixed(2)
-      users.value.forEach((user) => {
-        user.share = equalShare
-      })
+  [users, total_cost, isRefund, shareEqually],
+  ([newUsers, newTotalCost, newIsRefund, newShareEqually]) => {
+    if(newIsRefund){
+      if(!newShareEqually && newUsers.length > 1){ // 1 because the disabled user is always present
+        // Calculate the sum of shares for all users other than the disabled one
+        let sumOfOtherShares = 0;
+        for(let i = 1; i < newUsers.length; i++) {
+          sumOfOtherShares += parseFloat(newUsers[i].share || 0);
+        }
+        console.log(sumOfOtherShares);
+        // Update the share for the disabled user (expected to be at index 0)
+        newUsers[0].share = (-sumOfOtherShares).toFixed(2);
+        
+      }
+
+    } else {
+      if (newShareEqually && newTotalCost && newUsers.length > 0) {
+        const equalShare = (parseFloat(newTotalCost) / newUsers.length).toFixed(2);
+        newUsers.forEach(user => user.share = equalShare);
+      }
     }
   },
   { deep: true }
-)
+);
 
 // When the component is mounted, get the user_id from the store
 onMounted(() => {
@@ -261,7 +261,7 @@ const handleClose = (user) => {
 
     if (!userExists) {
       // Add share property to the user
-      user.share = userShare.value
+      //user.share = userShare.value
       users.value.push(user)
     } else {
       console.log('User already exists in the list')
@@ -284,18 +284,22 @@ const deleteUser = (index) => {
 }
 
 async function submitForm() {
+  console.log(total_cost.value)
   const result = await validateExpenseInput(
     date.value,
     category_id.value,
     total_cost.value,
-    description.value
+    description.value,
   )
   if (result.status === 'validated') {
     // Calculate the sum of all user shares
     const sumOfShares = users.value.reduce((sum, user) => sum + parseFloat(user.share), 0)
 
+    // Define an acceptable error margin
+    const epsilon = 0.01
+
     // Compare the sum of shares with the total cost
-    if (sumOfShares.toFixed(2) !== parseFloat(total_cost.value).toFixed(2)) {
+    if (Math.abs(sumOfShares - parseFloat(total_cost.value)) > epsilon) {
       // Set an error message and return from the function
       $toast.error('The sum of shares does not equal the total cost.', {
         hideProgressBar: true
@@ -306,6 +310,7 @@ async function submitForm() {
     // Get user_id from store
     const userStore = useUserStore()
     user_id.value = parseInt(userStore.user_id)
+
 
     const expense = {
       user_id: user_id.value,

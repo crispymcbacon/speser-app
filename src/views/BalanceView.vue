@@ -64,17 +64,17 @@
       
     balanceColor(balance) {
       balance = balance.toString();
-      if (balance.includes('Debit')) {
-        return 'text-red-500';
-      } else if (balance.includes('Credit')) {
-        return 'text-green-500';
+      if (balance.includes('Debit') || balance.includes('Paid')) {
+        return 'text-red-600';
+      } else if (balance.includes('Credit') || balance.includes('Received')) {
+        return 'text-green-600';
       } else {
         return 'text-gray-500';
       }
     },
     balanceText(balance) {
       balance = balance.toString();
-      if (balance.includes('Debit') || balance.includes('Credit')) {
+      if (balance.includes('Debit') || balance.includes('Credit')|| balance.includes('Refund')) {
         return balance;
       } else {
         return 'Done';
