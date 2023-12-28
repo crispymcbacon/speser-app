@@ -13,19 +13,23 @@ let searchResults = ref([]) // new ref for search results
 const router = useRouter()
 
 function balanceColor(balance) {
-  balance = balance.toString();
+  balance = balance.toString()
   if (balance.includes('Debit') || balance.includes('Paid') || balance.includes('You owe')) {
-    return 'text-red-600';
-  } else if (balance.includes('Credit') || balance.includes('Received') || balance.includes('You are owed')) {
-    return 'text-green-600';
+    return 'text-red-600'
+  } else if (
+    balance.includes('Credit') ||
+    balance.includes('Received') ||
+    balance.includes('You are owed')
+  ) {
+    return 'text-green-600'
   } else {
-    return 'text-gray-500';
+    return 'text-gray-500'
   }
 }
 
 const balanceLabel = (balance) => {
   if (balance < 0) {
-    return 'You owe €' + (-balance)
+    return 'You owe €' + -balance
   } else if (balance > 0) {
     return 'You are owed €' + balance
   } else {
@@ -36,7 +40,6 @@ const balanceLabel = (balance) => {
 const search = () => {
   const userStore = useUserStore()
   searchUser(searchQuery.value).then((res) => {
-    
     searchResults.value = res.slice(0, 5) // store only the first 5 search results
 
     // remove the logged-in user from the search results
@@ -72,80 +75,110 @@ const selectUser = (user) => {
   })
 }
 
+const goBack = () => {
+  router.back()
+}
+
+
 const goToDetail = (expense) => {
-  const year = new Date(expense.date).getFullYear();
-  const month = new Date(expense.date).getMonth() + 1;
-  const id = expense.id;
-  router.push({ name: 'expensedetail', params: { year, month, id } });
-};
+  const year = new Date(expense.date).getFullYear()
+  const month = new Date(expense.date).getMonth() + 1
+  const id = expense.id
+  router.push({ name: 'expensedetail', params: { year, month, id } })
+}
 </script>
 
 <template>
   <div>
-    <div class="px-4 mt-4">
-      <h1 class="text-4xl font-bold mb-6">Balance to user</h1>
-      <div class="text-lg font-semibold mb-2">Search by username:</div>
-      <div class="flex">
-      <input
-        v-model="searchQuery"
-        @input="search"
-        type="text"
-        class="w-full px-4 input input-bordered"
-        placeholder="Search..."
-      />
-      <!-- <button @click="search" class="px-4 btn uppercase">Search</button> -->
-    </div>
-
-      <!-- Dropdown list for search results -->
-    <div v-if="searchResults.length > 0" class="dropdown dropdown-open w-full">
-      <ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
-        <li v-for="(user, index) in searchResults" :key="index" @click="selectUser(user)">
-          <a>{{ user.username }}</a>
-        </li>
-      </ul>
-    </div>
-
-    </div>
-    <div v-if="data && data.length === 0">
-      <div class="px-4 mt-8 text-center">
-        <h1 class="text-md text-gray-500 mb-2">User not found, search again.</h1>
+    <div class="mt-4">
+      <div class="px-4 grid grid-cols-5 items-center">
+        <button @click="goBack">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="feather feather-arrow-left"
+          >
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+        </button>
+        <h1 class="text-2xl font-bold col-span-3 text-center">Balance to user</h1>
+        <div></div>
       </div>
-    </div>
-    <div v-else-if="data && data.expenses">
-      <div class="px-4 mt-4">
-        <div>
-          Balance respect to: <span class="font-bold">{{ username }}</span>
+      <div class="mt-6 px-4">
+        <div class="text-lg font-semibold mb-2">Search by username:</div>
+        <div class="flex">
+          <input
+            v-model="searchQuery"
+            @input="search"
+            type="text"
+            class="w-full px-4 input input-bordered"
+            placeholder="Search..."
+          />
+          <!-- <button @click="search" class="px-4 btn uppercase">Search</button> -->
         </div>
-        <div class="text-3xl font-bold my-2" :class="balanceColor(data.totalBalance)">
-          <span>{{ data.totalBalance }}</span>
+
+        <!-- Dropdown list for search results -->
+        <div v-if="searchResults.length > 0" class="dropdown dropdown-open w-full">
+          <ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
+            <li v-for="(user, index) in searchResults" :key="index" @click="selectUser(user)">
+              <a>{{ user.username }}</a>
+            </li>
+          </ul>
         </div>
       </div>
+      <div v-if="data && data.length === 0">
+        <div class="px-4 mt-8 text-center">
+          <h1 class="text-md text-gray-500 mb-2">User not found, search again.</h1>
+        </div>
+      </div>
+      <div v-else-if="data && data.expenses">
+        <div class="px-4 mt-4">
+          <div>
+            Balance respect to: <span class="font-bold">{{ username }}</span>
+          </div>
+          <div class="text-3xl font-bold my-2" :class="balanceColor(data.totalBalance)">
+            <span>{{ data.totalBalance }}</span>
+          </div>
+        </div>
 
-      <div class="overflow-x-auto mt-2">
-        <table class="table table-zebra">
-          <!-- head -->
-          <thead>
-            <tr>
-              <th></th>
-              <th>Description</th>
-              <th class="hidden sm:table-cell">Date</th>
-              <th>Total Cost</th>
-              <th>Balance</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- dynamic rows -->
-            <tr v-for="(expense, index) in data.expenses" :key="index" @click="goToDetail(expense)">
-              <th>{{ index + 1 }}</th>
-              <td>{{ expense.description }}</td>
-              <td class="hidden sm:table-cell">
-                {{ new Date(expense.date).toLocaleDateString() }}
-              </td>
-              <td>{{ expense.total_cost }}</td>
-              <td :class="balanceColor(expense.balance)">{{ expense.balance }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="overflow-x-auto mt-2">
+          <table class="table table-zebra">
+            <!-- head -->
+            <thead>
+              <tr>
+                <th></th>
+                <th>Description</th>
+                <th class="hidden sm:table-cell">Date</th>
+                <th>Total Cost</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- dynamic rows -->
+              <tr
+                v-for="(expense, index) in data.expenses"
+                :key="index"
+                @click="goToDetail(expense)"
+              >
+                <th>{{ index + 1 }}</th>
+                <td>{{ expense.description }}</td>
+                <td class="hidden sm:table-cell">
+                  {{ new Date(expense.date).toLocaleDateString() }}
+                </td>
+                <td>{{ expense.total_cost }}</td>
+                <td :class="balanceColor(expense.balance)">{{ expense.balance }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

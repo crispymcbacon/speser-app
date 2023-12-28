@@ -3,7 +3,15 @@
     <div v-if="loading">Loading...</div>
     <div v-else>
       <div class="px-4 mt-4">
-        <h1 class="text-4xl font-bold mb-2">Balance</h1>
+        <div class="flex flex-row justify-between">
+          <h1 class="text-4xl font-bold mb-2">Balance</h1>
+          <button>
+            <RouterLink active-class="active" to="/balancetouser" @click="isSidebarOpen = false">
+              <IconUserSearch :size="32" stroke-width="2" />
+            </RouterLink>
+            
+          </button>
+        </div>
         <div class="flex flex-row">
           <div class="stat text-center">
           <div class="stat-title">You own</div>
@@ -49,6 +57,7 @@
 import { ref, onMounted } from 'vue';
 import { getBalance } from '../lib/api.js';
 import { useRouter } from 'vue-router';
+import { IconUserSearch } from '@tabler/icons-vue';
 
 const loading = ref(true);
 const data = ref(null);

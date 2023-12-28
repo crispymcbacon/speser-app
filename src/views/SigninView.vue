@@ -10,7 +10,7 @@
                         <div class="label">
                             <span class="label-text">Username</span>
                         </div>
-                        <input v-model="username" type="text" id="username"  placeholder="myuser" class="input input-bordered w-full" />
+                        <input v-model="username" type="text" id="username"  placeholder="myuser" class="input input-bordered w-full" autocapitalize="none"/>
                     </label>
                 </div>
                 <div class="mb-6">
@@ -27,30 +27,23 @@
     </div>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue';
 import { signin } from '../lib/api.js';
+import router from '@/router';
 
-export default {
-    data() {
-        return {
-            username: '',
-            password: '',
-        };
-    },
-    methods: {
-        async login() {
-            try{
-                await signin(this.username, this.password)
-                this.$emit('login-success') // Emit event after successful login
-                this.$router.push('/')
-            } catch (error) {
-                console.log(error)
-            }
-        },
-    },
+const emit = defineEmits(['login-success']);
+
+let username = ref('');
+let password = ref('');
+
+const login = async () => {
+    try {
+        await signin(username.value, password.value);
+        emit('login-success'); // Emit event after successful login
+        router.push({ name: 'home' });
+    } catch (error) {
+        console.log(error);
+    }
 };
 </script>
-
-<style>
-/* Add any custom styles here */
-</style>
