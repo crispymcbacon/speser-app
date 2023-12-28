@@ -12,14 +12,14 @@ const $toast = useToast()
 let searchResults = ref([]) // new ref for search results
 const router = useRouter()
 
-const balanceColor = (balance) => {
-  balance = balance.toString()
-  if (balance.includes('Debit') || balance.includes('You owe')) {
-    return 'text-red-700'
-  } else if (balance.includes('Credit')|| balance.includes('You are owed')) {
-    return 'text-green-700'
+function balanceColor(balance) {
+  balance = balance.toString();
+  if (balance.includes('Debit') || balance.includes('Paid') || balance.includes('You owe')) {
+    return 'text-red-600';
+  } else if (balance.includes('Credit') || balance.includes('Received') || balance.includes('You are owed')) {
+    return 'text-green-600';
   } else {
-    return 'text-gray-500'
+    return 'text-gray-500';
   }
 }
 
@@ -66,8 +66,8 @@ const selectUser = (user) => {
       data.value = []
     } else {
       data.value = res
-      data.value.totalBalance = balanceLabel(res.totalBalance)
       console.log(data.value)
+      data.value.totalBalance = balanceLabel(res.totalBalance)
     }
   })
 }
@@ -116,7 +116,7 @@ const goToDetail = (expense) => {
         <div>
           Balance respect to: <span class="font-bold">{{ username }}</span>
         </div>
-        <div class="text-3xl font-bold" :class="balanceColor(data.totalBalance)">
+        <div class="text-3xl font-bold my-2" :class="balanceColor(data.totalBalance)">
           <span>{{ data.totalBalance }}</span>
         </div>
       </div>

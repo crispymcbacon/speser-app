@@ -189,6 +189,7 @@ const shareEqually = ref(true)
 const $toast = useToast()
 const isRefund = ref(false)
 const isDialogOpen = ref(false)
+const categories = ref([])
 
 // Track refund
 watch(isRefund, (newVal) => {
@@ -197,12 +198,6 @@ watch(isRefund, (newVal) => {
     category_id.value = 1
     shareEqually.value = false
   }
-})
-
-// Get categories from API
-let categories = []
-getCategories().then((response) => {
-  categories = response
 })
 
 // Define dialog state and content
@@ -246,8 +241,22 @@ onMounted(() => {
   const userStore = useUserStore()
   user_id.value = userStore.user_id
 
+  // Set the current date
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed, so we need to add 1
+  const day = String(today.getDate()).padStart(2, '0');
+  const output = today.getFullYear()+'-'+month+'-'+day;
+  date.value = output;
+
   // Check if the user is not already in the list
   const userExists = users.value.some((existingUser) => existingUser.id === user_id.value)
+
+  // Get Categories
+  getCategories().then((response) => {
+    categories.value = response
+    // Remove the first category (id = 1) from the list, as it is the Refund category
+    categories.value.shift()
+  })
 
   if (!userExists) {
     // Add current user to the list

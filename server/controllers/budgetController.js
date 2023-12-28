@@ -339,6 +339,7 @@ export const getUserBalance = async (req, res) => {
         e.date, 
         e.total_cost, 
         es.share as balance,
+        es.user_id,
         (e.user_id = $1) as is_own_expense
       FROM 
         expenses e
@@ -356,34 +357,56 @@ export const getUserBalance = async (req, res) => {
     let creditBalance = 0
 
     // Convert the balance to a debit or credit
-    expenses.forEach((expense) => {
+    expenses.forEach((share) => {
       // Ensure expense.balance is a float
-      expense.balance = parseFloat(expense.balance)
+      share.balance = parseFloat(share.balance)
 
       // If expense.balance is NaN after parseInt (which means it was not a number to begin with), set it to 0
-      if (isNaN(expense.balance)) {
-        expense.balance = 0
+      if (isNaN(share.balance)) {
+        share.balance = 0
       }
 
-      if (expense.is_own_expense) {
-        // Only add to credit balance if the user's share is less than the total cost
-        if (expense.balance > 0 && expense.balance < expense.total_cost) {
-          creditBalance += expense.balance
-          expense.balance = `Credit: ${expense.balance}`
-        } else if (expense.balance < 0) {
-          debitBalance += expense.balance // REFUND
-          expense.balance = `Refund Paid: ${-expense.balance}`
+      if (share.is_own_expense) { // If the share is owned by the logged user
+        if(!(parseInt(share.user_id) === parseInt(user_id))){ // If the logged user is the owner of the share_share
+          if (share.balance > 0) { // Credit
+            creditBalance += share.balance
+            share.balance = `Credit: ${share.balance}`
+          } else { // Refunds to other users
+            console.log('Error 1, Other credit or other refund')
+          }
+        } else {
+          if (share.balance < 0) { // Refund received
+            debitBalance += share.balance // REFUND, so remove from debit balance
+            share.balance = `Refund Paid: ${-share.balance}`
+          } else { 
+            share.balance = `Own expense: ${share.balance}`
+          }
         }
-      } else {
-        if (expense.balance > 0) {
-          debitBalance += expense.balance
-          expense.balance = `Debit: ${expense.balance}`
-        } else if (expense.balance < 0) {
-          creditBalance += expense.balance // REFUND
-          expense.balance = `Refund Received: ${-expense.balance}`
+      } else{
+        if(parseInt(share.user_id) === parseInt(user_id)){
+          if (share.balance > 0) {
+            debitBalance += share.balance
+            share.balance = `Debit: ${share.balance}`
+          } else if (share.balance < 0) { // Refund received
+            creditBalance += share.balance // REFUND, so remove from credit balance
+            share.balance = `Refund Received: ${-share.balance}`
+          }
+        } else {
+          console.log('Error 2, Other debit or other refund')
         }
       }
     })
+
+    // if the debit or credit are negative, invert them
+    if(creditBalance < 0){
+      debitBalance -= creditBalance
+      creditBalance = 0
+    }
+    if(debitBalance < 0){
+      creditBalance -= debitBalance
+      debitBalance = 0
+    }
+    
 
     res.json({ expenses, debitBalance, creditBalance }) // Send the expenses in the response
   } catch (err) {
@@ -405,6 +428,7 @@ export const getUserBalanceWithId = async (req, res) => {
         e.date, 
         e.total_cost, 
         es.share as balance,
+        es.user_id,
         (e.user_id = $1) as is_own_expense
       FROM 
         expenses e
@@ -422,32 +446,45 @@ export const getUserBalanceWithId = async (req, res) => {
     let creditBalance = 0
 
     // Convert the balance to a debit or credit
-    expenses.forEach((expense) => {
-      // Ensure expense.balance is an integer
-      expense.balance = parseInt(expense.balance, 10)
+    expenses.forEach((share) => {
+      // Ensure expense.balance is a float
+      share.balance = parseFloat(share.balance)
 
-      // If expense.balance is NaN after parseInt (which means it was not a number to begin with), set it to 0
-      if (isNaN(expense.balance)) {
-        expense.balance = 0
+      // If share.balance is NaN after parseInt (which means it was not a number to begin with), set it to 0
+      if (isNaN(share.balance)) {
+        share.balance = 0
       }
 
-      if (expense.is_own_expense) {
-        // Only add to credit balance if the user's share is less than the total cost
-        if (expense.balance > 0 && expense.balance < expense.total_cost) {
-          creditBalance += expense.balance
-          expense.balance = `Credit: ${expense.balance}`
+      if (share.is_own_expense) { // If the share is owned by the logged user
+        if(!(parseInt(share.user_id) === parseInt(logged_user_id))){ // If the logged user is the owner of the share_share
+          if (share.balance > 0) { // Credit
+            creditBalance += share.balance
+            share.balance = `Credit: ${share.balance}`
+          } else { // Refund received
+            debitBalance += share.balance // REFUND, so remove from debit balance
+            share.balance = `Refund Paid: ${-share.balance}`
+          }
+        } else {
+          console.log('Error 1')
         }
-      } else {
-        if (expense.balance > 0) {
-          debitBalance += expense.balance
-          expense.balance = `Debit: ${expense.balance}`
+      } else{
+        if(parseInt(share.user_id) === parseInt(logged_user_id)){
+          if (share.balance > 0) {
+            debitBalance += share.balance
+            share.balance = `Debit: ${share.balance}`
+          } else if (share.balance < 0) { // Refund received
+            creditBalance += share.balance // REFUND, so remove from credit balance
+            share.balance = `Refund Received: ${-share.balance}`
+          }
+        } else {
+          console.log('Error 2')
         }
       }
     })
 
     const totalBalance = creditBalance - debitBalance
 
-    res.json({ expenses, debitBalance, creditBalance, totalBalance }) // Send the expenses and total balance in the response
+    res.json({ expenses, debitBalance, creditBalance, totalBalance }) // Send the shares and total balance in the response
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' })
   }
