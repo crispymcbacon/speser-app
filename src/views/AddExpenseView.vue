@@ -188,6 +188,7 @@ const users = ref([])
 const shareEqually = ref(true)
 const $toast = useToast()
 const isRefund = ref(false)
+const isDialogOpen = ref(false)
 
 // Track refund
 watch(isRefund, (newVal) => {
@@ -205,7 +206,7 @@ getCategories().then((response) => {
 })
 
 // Define dialog state and content
-const isDialogOpen = ref(false)
+
 // Define dialog actions
 
 // Define a method to open the dialog

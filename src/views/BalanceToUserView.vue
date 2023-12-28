@@ -3,12 +3,14 @@ import { ref } from 'vue'
 import { searchUser, getBalanceToUser } from '../lib/api.js'
 import { useUserStore } from '../lib/stores.js'
 import { useToast } from 'vue-toastification'
+import { useRouter } from 'vue-router'
 
 let data = ref(null)
 const username = ref('')
 const searchQuery = ref('')
 const $toast = useToast()
 let searchResults = ref([]) // new ref for search results
+const router = useRouter()
 
 const balanceColor = (balance) => {
   balance = balance.toString()
@@ -65,9 +67,17 @@ const selectUser = (user) => {
     } else {
       data.value = res
       data.value.totalBalance = balanceLabel(res.totalBalance)
+      console.log(data.value)
     }
   })
 }
+
+const goToDetail = (expense) => {
+  const year = new Date(expense.date).getFullYear();
+  const month = new Date(expense.date).getMonth() + 1;
+  const id = expense.id;
+  router.push({ name: 'expensedetail', params: { year, month, id } });
+};
 </script>
 
 <template>
@@ -125,7 +135,7 @@ const selectUser = (user) => {
           </thead>
           <tbody>
             <!-- dynamic rows -->
-            <tr v-for="(expense, index) in data.expenses" :key="index">
+            <tr v-for="(expense, index) in data.expenses" :key="index" @click="goToDetail(expense)">
               <th>{{ index + 1 }}</th>
               <td>{{ expense.description }}</td>
               <td class="hidden sm:table-cell">

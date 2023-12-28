@@ -23,6 +23,17 @@ function sendPOSTRequest(url, body) {
     });
 }
 
+function sendPUTRequest(url, body) {
+    return fetch(api_url+url, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${VueCookies.get('jwt')}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+    });
+}
+
 // ------ Auth -------------------------------------------------------------------
 export async function signin(username, password) {
     try {
@@ -130,6 +141,24 @@ export async function getExpense(year, month, id) {
         console.error('Error:', error);
     }
 }
+
+export async function updateExpense(year, month, id, user_id, description, category_id, total_cost, users, date) {
+    try {
+        const response = await sendPUTRequest(`/budget/${year}/${month}/${id}`, {
+            user_id: user_id,
+            description: description,
+            category_id: category_id,
+            total_cost: total_cost,
+            users: users,
+            expense_id: id,
+            date: date,
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Error:', error);
+    }
+
+}
 // ------ Balance ----------------------------------------------------------------
 export async function getBalance() {
     try {
@@ -170,6 +199,14 @@ export async function searchExpense(query){
     }
 }
 
+export async function searchUsersOfExpense(query){
+    try {
+        const response = await sendGETRequest(`/categories/search?q=${query}`);
+        return await response.json();
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
 // ------ Categories -------------------------------------------------------------
 
 export async function getCategories() {

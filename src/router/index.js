@@ -8,6 +8,8 @@ import AddExpenseView from '../views/AddExpenseView.vue'
 import ExpensesView from '../views/ExpensesView.vue'
 import SearchExpenseView from '../views/SearchExpenseView.vue'
 import ExpenseDetailView from '../views/ExpenseDetailView.vue'
+import ExpenseEditViewVue from '../views/ExpenseEditView.vue'
+import NotFoundView from '../views/NotFoundView.vue'
 
 import VueCookies from 'vue-cookies';
 
@@ -19,14 +21,6 @@ const router = createRouter({
       name: 'home',
       component: HomeView,
       meta: { requiresAuth: true }
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue')
     },
     {
       path: '/signin',
@@ -72,10 +66,21 @@ const router = createRouter({
     },
     {
       path: '/expense/:year/:month/:id',
-      name: 'ExpenseDetail',
+      name: 'expensedetail',
       component: ExpenseDetailView,
       meta: { requiresAuth: true }
-    }
+    },
+    {
+      path: '/expenseedit/:year/:month/:id',
+      name: 'expenseedit',
+      component: ExpenseEditViewVue,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'notfound',
+      component: NotFoundView,
+    },
   ]
 })
 
@@ -87,8 +92,9 @@ router.beforeEach((to, from, next) => {
   if (requiresAuth && !currentUser) {
     next('/signin');
   } else if (!requiresAuth && currentUser) {
-    next('/');
+    next();
   } else {
+    //next('/notfound');
     next();
   }
 });

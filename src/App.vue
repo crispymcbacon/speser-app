@@ -61,7 +61,6 @@ const logout = () => {
             <!-- Sidebar content here -->
           <li v-if="isLoggedIn"><RouterLink active-class="active" to="/" @click="isSidebarOpen = false">Home</RouterLink></li>
           <li v-if="isLoggedIn"><RouterLink active-class="active" to="/expenses" @click="isSidebarOpen = false">Expenses</RouterLink></li>
-          <li v-if="isLoggedIn"><RouterLink active-class="active" to="/searchexpense" @click="isSidebarOpen = false">Search Expense</RouterLink></li>
           <li v-if="isLoggedIn"><RouterLink active-class="active" to="/addexpense" @click="isSidebarOpen = false">Add Expense</RouterLink></li>
           <li v-if="isLoggedIn"><RouterLink active-class="active" to="/balance" @click="isSidebarOpen = false">Balance</RouterLink></li>
           <li v-if="isLoggedIn"><RouterLink active-class="active" to="/balancetouser" @click="isSidebarOpen = false">Balance To User</RouterLink></li>

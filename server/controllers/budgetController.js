@@ -99,7 +99,6 @@ export const loginUser = async (req, res) => {
 export const getUserExpenses = async (req, res) => {
   try {
     const user_id = req.user_id // Get the user ID from the request
-    console.log(req.user_id) // Log the user ID
 
     const result = await db.query(
       'SELECT * FROM expenses WHERE user_id = $1', // Query to fetch expenses for the user
@@ -125,9 +124,6 @@ export const getUserExpensesByYear = async (req, res) => {
     )
 
     const expenses = result.rows // Store the fetched expenses
-
-    // print the date
-    console.log(expenses[0].date)
 
     res.json(expenses) // Send the expenses in the response
   } catch (err) {
@@ -156,7 +152,6 @@ export const getUserExpensesByYearMonth = async (req, res) => {
 
 export const getUserExpensesByYearMonthId = async (req, res) => {
   try {
-    const user_id = req.user_id // Get the user ID from the request
     const year = req.params.year // Get the year from the request parameters
     const month = req.params.month // Get the month from the request parameters
     const id = req.params.id // Get the id from the request parameters
@@ -164,13 +159,23 @@ export const getUserExpensesByYearMonthId = async (req, res) => {
     const result = await db.query(
       `SELECT expenses.*, categories.name AS category_name FROM expenses 
        LEFT JOIN categories ON expenses.category_id = categories.id
-       WHERE user_id = $1 AND EXTRACT(YEAR FROM date) = $2 AND EXTRACT(MONTH FROM date) = $3 AND expenses.id = $4`, // Query to fetch expenses for the user for a specific year, month, and id
-      [user_id, year, month, id]
+       WHERE EXTRACT(YEAR FROM date) = $1 AND EXTRACT(MONTH FROM date) = $2 AND expenses.id = $3`, // Query to fetch expenses for the user for a specific year, month, and id
+      [year, month, id]
     )
 
     const expenses = result.rows // Store the fetched expenses
 
-    res.json(expenses) // Send the expenses in the response
+    // New query to fetch users and their shares for the given expense
+    const userSharesResult = await db.query(
+      `SELECT users.*, expense_shares.share FROM expense_shares 
+       JOIN users ON expense_shares.user_id = users.id
+       WHERE expense_shares.expense_id = $1`, // Query to fetch users and their shares for the given expense
+      [id]
+    )
+
+    const users = userSharesResult.rows // Store the fetched users and their shares
+    expenses[0].users = users // Add the users and their shares to the expense
+    res.json(expenses) // Send the expenses and users in the response
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' })
   }
@@ -201,10 +206,6 @@ export const addUserExpense = async (req, res) => {
       // Define an acceptable error margin
       const epsilon = 0.01
 
-      console.log(totalShares)
-
-      console.log(Math.abs(totalShares - parseFloat(total_cost)))
-
       // Compare the sum of shares with the total cost
       if (Math.abs(totalShares - parseFloat(total_cost)) > epsilon) {
         return res.status(400).json({ message: 'The sum of all shares must equal the total cost.' })
@@ -215,8 +216,8 @@ export const addUserExpense = async (req, res) => {
         // convert user_id to integer
         user.user_id = parseInt(user.user_id, 10)
 
-        // If the user is not the logged user, make the share negative
-        if (user.user_id !== logged_user_id) {
+        // If the user is not the logged user and the total_cost is zero, make the share negative
+        if (user.user_id !== logged_user_id && parseFloat(total_cost) === 0) {
           user.share = user.share * -1;
         }
         await db.query(
@@ -240,21 +241,65 @@ export const addUserExpense = async (req, res) => {
 
 export const updateUserExpense = async (req, res) => {
   try {
-    const { year, month, id } = req.params
-    const { description, total_cost, category_id } = req.body
+    const logged_user_id = req.user_id // Get the user ID from the request
+    const { year, month } = req.params
+    const { user_id, description, category_id, total_cost, users, expense_id, date } = req.body
 
-    const date = new Date(year, month - 1) // JavaScript months are 0-indexed
-    const user_id = req.user_id // Get the user ID from the request
+    // Convert year and month to a JavaScript Date object
+    const newdate = new Date(date)
 
+    console.log('newdate', newdate)
+
+
+    // Update the expense in the expenses table
     await db.query(
-      `UPDATE expenses SET description = $1, total_cost = $2, category_id = $3, date = $4
-      WHERE id = $5 AND user_id = $6 AND EXTRACT(YEAR FROM date) = $7 AND EXTRACT(MONTH FROM date) = $8`,
-      [description, total_cost, category_id, date, id, user_id, year, month]
+      'UPDATE expenses SET user_id=$1, date=$2, description=$3, category_id=$4, total_cost=$5 WHERE id=$6',
+      [user_id, newdate, description, category_id, total_cost, expense_id]
     )
 
-    res.status(200).json({ message: 'Expense updated successfully.' })
+    if (users && users.length > 0) {
+      // Calculate the sum of all shares
+      const totalShares = users.reduce((sum, user) => sum + parseFloat(user.share), 0)
+
+      // Define an acceptable error margin
+      const epsilon = 0.01
+
+      // Compare the sum of shares with the total cost
+      if (Math.abs(totalShares - parseFloat(total_cost)) > epsilon) {
+        return res.status(400).json({ message: 'The sum of all shares must equal the total cost.' })
+      }
+
+      // Delete old shares
+      await db.query(
+        'DELETE FROM expense_shares WHERE expense_id=$1',
+        [expense_id]
+      )
+
+      // If users is provided, add an expense share for each user
+      for (let user of users) {
+        // convert user_id to integer
+        user.user_id = parseInt(user.user_id, 10)
+
+        // If the user is not the logged user, make the share negative
+        if (user.user_id !== logged_user_id && parseFloat(total_cost) === 0) {
+          user.share = user.share * -1;
+        }
+        await db.query(
+          'INSERT INTO expense_shares (expense_id, user_id, share) VALUES ($1, $2, $3)',
+          [expense_id, user.user_id, user.share]
+        )
+      }
+    } else {
+      // If users is not provided, add an expense share for the user_id with the total_cost as the share
+      await db.query(
+        'INSERT INTO expense_shares (expense_id, user_id, share) VALUES ($1, $2, $3)',
+        [expense_id, user_id, total_cost]
+      )
+    }
+
+    res.status(200).json({ message: 'Expense and expense share updated successfully.' })
   } catch (err) {
-    res.status(500).json({ message: 'Failed to update expense.' })
+    res.status(500).json({ message: 'Error updating expense and expense share: ' + err })
   }
 }
 
@@ -289,6 +334,7 @@ export const getUserBalance = async (req, res) => {
     // Query to get the expenses and the user's share of each expense
     const query = `
       SELECT 
+        es.expense_id,
         e.description, 
         e.date, 
         e.total_cost, 
@@ -338,7 +384,7 @@ export const getUserBalance = async (req, res) => {
         }
       }
     })
-    console.log({ expenses, debitBalance, creditBalance })
+
     res.json({ expenses, debitBalance, creditBalance }) // Send the expenses in the response
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' })
@@ -353,7 +399,8 @@ export const getUserBalanceWithId = async (req, res) => {
 
     // Query to get the expenses and the user's share of each expense
     const query = `
-      SELECT 
+      SELECT
+        e.id,
         e.description, 
         e.date, 
         e.total_cost, 
@@ -369,8 +416,6 @@ export const getUserBalanceWithId = async (req, res) => {
 
     const result = await db.query(query, [logged_user_id, user_id])
     const expenses = result.rows // Get the expenses from the query result
-
-    console.log(expenses)
 
 
     let debitBalance = 0
@@ -402,7 +447,6 @@ export const getUserBalanceWithId = async (req, res) => {
 
     const totalBalance = creditBalance - debitBalance
 
-    console.log({ expenses, debitBalance, creditBalance, totalBalance })
     res.json({ expenses, debitBalance, creditBalance, totalBalance }) // Send the expenses and total balance in the response
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' })
@@ -459,15 +503,12 @@ export const getAuthUser = async (req, res) => {
   try {
     const user_id = req.user_id // Get the user ID from the request
 
-    console.log(user_id)
-
     const result = await db.query(
       'SELECT id, username, first_name, last_name, created_at FROM users WHERE id = $1', // Query to fetch user information
       [user_id]
     )
 
     const user = result.rows[0] // Store the fetched user information
-    console.log(user)
 
     res.json(user) // Send the user information in the response
   } catch (err) {
