@@ -38,7 +38,7 @@ const logout = () => {
       <div class="flex flex-row items-center mt-2">
         <div class="avatar placeholder">
           <div class="bg-neutral text-neutral-content rounded-full w-24">
-            <span class="text-3xl">JD</span>
+            <span class="text-3xl">{{ user.first_name.charAt(0) + user.last_name.charAt(0) }}</span>
           </div>
         </div>
         <div class="flex flex-col ml-4">

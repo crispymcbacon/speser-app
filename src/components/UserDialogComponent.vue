@@ -18,7 +18,7 @@
             <div v-if="searchResults.length > 0" class="dropdown dropdown-open w-full">
               <ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
                 <li v-for="(user, index) in searchResults" :key="index" @click="selectUser(user)">
-                  <a>{{ user.username }}</a>
+                  <a class="font-semibold">@{{ user.username }}</a>
                 </li>
               </ul>
             </div>

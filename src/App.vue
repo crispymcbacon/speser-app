@@ -29,7 +29,7 @@ const handleLogout = () => {
 <template>
   <header class="navbar bg-base-100">
     <div class="navbar-start">
-      <a class="btn btn-ghost text-3xl px-2 text-secondary">Speser</a>
+      <a class="btn btn-ghost text-3xl px-2 text-primary">Speser</a>
     </div>
 
     <div class="navbar-center hidden lg:flex">
@@ -52,8 +52,8 @@ const handleLogout = () => {
     <RouterView @login="handleLogin" @logout="handleLogout" />
   </div>
 
-  <div class="fixed inset-x-0 bottom-0 z-10 pb-2 px-10">
-    <ul class="menu menu-horizontal bg-base-200 rounded-box w-full justify-center px-2 py-4">
+  <div class="fixed inset-x-0 bottom-0 z-10 pb-2 px-8">
+    <ul class="menu menu-horizontal shadow-md bg-base-200 rounded-box w-full justify-center px-2 py-4 space-x-1">
       <li v-if="isLoggedIn">
         <RouterLink active-class="active" to="/">
           <IconHome :size="24" stroke-width="2" />

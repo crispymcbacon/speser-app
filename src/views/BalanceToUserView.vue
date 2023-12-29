@@ -80,7 +80,6 @@ const goBack = () => {
   router.back()
 }
 
-
 const goToDetail = (expense) => {
   const year = new Date(expense.date).getFullYear()
   const month = new Date(expense.date).getMonth() + 1
@@ -101,7 +100,7 @@ const goToDetail = (expense) => {
       </div>
       <div class="mt-6 px-4">
         <div class="text-lg font-semibold mb-2">Search by username:</div>
-        <div class="flex">
+        <div class="flex flex-col">
           <input
             v-model="searchQuery"
             @input="search"
@@ -111,15 +110,14 @@ const goToDetail = (expense) => {
             autocapitalize="none"
           />
           <!-- <button @click="search" class="px-4 btn uppercase">Search</button> -->
-        </div>
-
-        <!-- Dropdown list for search results -->
-        <div v-if="searchResults.length > 0" class="dropdown dropdown-open w-full">
-          <ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
-            <li v-for="(user, index) in searchResults" :key="index" @click="selectUser(user)">
-              <a>{{ user.username }}</a>
-            </li>
-          </ul>
+          <!-- Dropdown list for search results -->
+          <div v-if="searchResults.length > 0" class="dropdown dropdown-open w-full">
+            <ul class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
+              <li v-for="(user, index) in searchResults" :key="index" @click="selectUser(user)">
+                <a class="font-semibold">@{{ user.username }}</a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
       <div v-if="data && data.length === 0">
@@ -130,7 +128,7 @@ const goToDetail = (expense) => {
       <div v-else-if="data && data.expenses">
         <div class="px-4 mt-4">
           <div>
-            Balance respect to: <span class="font-bold">{{ username }}</span>
+            Balance respect to: <span class="font-bold">@{{ username }}</span>
           </div>
           <div class="text-3xl font-bold my-2" :class="balanceColor(data.totalBalance)">
             <span>{{ data.totalBalance }}</span>

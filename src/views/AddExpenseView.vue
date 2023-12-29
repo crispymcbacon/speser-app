@@ -36,7 +36,7 @@
         <!-- Date & Category -->
         <div class="flex flex-row space-x-4 px-4">
           <!-- Date -->
-          <div class="mb-2 grow">
+          <div class="mb-2 w-1/2">
             <label class="form-control w-full">
               <div class="label">
                 <span class="label-text font-semibold">Date</span>
@@ -54,7 +54,7 @@
             </div>
           </div>
           <!-- Category -->
-          <div class="mb-2 grow">
+          <div class="mb-2 w-1/2">
             <label class="form-control w-full">
               <div class="label">
                 <span class="label-text font-semibold">Category</span>
@@ -119,7 +119,7 @@
             <!-- head -->
             <thead>
               <tr>
-                <th class="w-1/2">Username</th>
+                <th class="sm:w-1/2">Username</th>
                 <th>Share</th>
                 <th>Action</th>
                 <!-- New column -->

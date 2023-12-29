@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { searchExpense } from '../lib/api.js'
 import { useRouter } from 'vue-router'
-import { IconArrowLeft } from '@tabler/icons-vue'
+import { IconArrowLeft, IconSearch } from '@tabler/icons-vue'
 
 let data = ref(null)
 const searchQuery = ref('')
@@ -44,16 +44,17 @@ const goToDetail = (expense) => {
       </div>
       <div class="mt-6 px-4">
         <div class="text-lg font-semibold mb-2">Search by description:</div>
-        <div class="flex">
+        <div class="flex join">
           <input
             v-model="searchQuery"
             type="text"
-            class="w-full px-4 input input-bordered"
+            class="w-full px-4 input input-bordered join-item"
             placeholder="Search..."
             autocapitalize="none"
           />
-          <button @click="search" class="px-4 btn uppercase">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48" id="search"><path d="M46.599 40.236L36.054 29.691C37.89 26.718 39 23.25 39 19.5 39 8.73 30.27 0 19.5 0S0 8.73 0 19.5 8.73 39 19.5 39c3.75 0 7.218-1.11 10.188-2.943l10.548 10.545a4.501 4.501 0 0 0 6.363-6.366zM19.5 33C12.045 33 6 26.955 6 19.5S12.045 6 19.5 6 33 12.045 33 19.5 26.955 33 19.5 33z"></path></svg></button>
+          <button @click="search" class="px-4 btn uppercase join-item">
+            <IconSearch :size="24" stroke-width="3" />
+          </button>
         </div>
       </div>
       <div v-if="data && data.length === 0">

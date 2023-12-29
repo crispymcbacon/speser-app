@@ -43,6 +43,7 @@ const toast = useToast()
 const login = async () => {
     try {
         const response = await signin(username.value, password.value);
+        console.log(response);
         if (response.status === 'success') {
             emit('login'); // Emit event after successful login
             router.push({ name: 'home' });

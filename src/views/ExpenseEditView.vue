@@ -191,7 +191,7 @@ import { getExpense } from '../lib/api'
 import { IconArrowLeft, IconTrash, IconUserPlus, IconEdit } from '@tabler/icons-vue'
 
 // eslint-disable-next-line no-unused-vars
-const emits = defineEmits(['loginSuccess', 'openSidebar'])
+const emits = defineEmits(['login', 'logout'])
 
 const user_id = ref('')
 const date = ref('')

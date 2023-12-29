@@ -499,7 +499,7 @@ export const searchExpenses = async (req, res) => {
     // Query to search expenses based on the description containing the search query and only for the logged user
     const searchQuery = `
       SELECT * FROM expenses
-      WHERE description LIKE $1
+      WHERE description ILIKE $1
       AND user_id = $2;
     `
 
