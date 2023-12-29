@@ -1,52 +1,23 @@
 <template>
-  <div class="flex">
+  <!-- Header -->
+  <div class="px-4 grid grid-cols-5 items-center">
+    <button @click="goBack">
+      <IconArrowLeft :size="24" stroke-width="2" />
+    </button>
+    <h1 class="text-2xl font-bold col-span-3 text-center">Edit expense</h1>
+    <div></div>
+  </div>
+  <!-- Search input -->
+  <div class="flex mt-4">
     <div class="max-w-md w-full">
-      <div class="ml-4 mb-2">
-        <button @click="goBack" class="">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-arrow-left"
-          >
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-        </button>
-      </div>
       <div v-if="loading" class="text-center">
         <div class="spinner"></div>
         Loading...
       </div>
       <div v-else>
-        <div class="px-4">
-          <h1 class="text-3xl font-bold mb-6">Edit Expense</h1>
-        </div>
-        <form @submit.prevent="submitForm" class="px-4 text-center">
-          <div class="mb-2">
-            <label class="form-control w-full">
-              <div class="label">
-                <span class="label-text font-semibold">Date</span>
-              </div>
-              <input
-                v-model="date"
-                type="date"
-                id="date"
-                placeholder="Date"
-                class="input input-bordered w-full"
-              />
-            </label>
-            <div v-if="errors.date" class="text-red-500 text-sm text-right mt-1">
-              {{ errors.date }}
-            </div>
-          </div>
-          <div class="mb-2">
+        <form @submit.prevent="submitForm" class="text-center">
+          <!-- Total Cost-->
+          <div class="mb-2 px-4">
             <label class="form-control w-full">
               <div class="label">
                 <span class="label-text font-semibold">Total Cost</span>
@@ -69,32 +40,55 @@
               {{ errors.total_cost }}
             </div>
           </div>
-          <div class="mb-2">
-            <label class="form-control w-full">
-              <div class="label">
-                <span class="label-text font-semibold">Category ID</span>
+          <!-- Date & Category -->
+          <div class="flex flex-row space-x-4 px-4">
+            <!-- Date -->
+            <div class="mb-2 grow">
+              <label class="form-control w-full">
+                <div class="label">
+                  <span class="label-text font-semibold">Date</span>
+                </div>
+                <input
+                  v-model="date"
+                  type="date"
+                  id="date"
+                  placeholder="Date"
+                  class="input input-bordered w-full"
+                />
+              </label>
+              <div v-if="errors.date" class="text-red-500 text-sm text-right mt-1">
+                {{ errors.date }}
               </div>
-              <select
-                v-model="category_id"
-                id="category_id"
-                class="select select-bordered w-full"
-                :disabled="isRefund"
-              >
-                <option value="" disabled selected>Select Category</option>
-                <option
-                  v-for="category in categories"
-                  :value="category.category_id"
-                  :key="category.category_id"
+            </div>
+            <!-- Category -->
+            <div class="mb-2 grow">
+              <label class="form-control w-full">
+                <div class="label">
+                  <span class="label-text font-semibold">Category</span>
+                </div>
+                <select
+                  v-model="category_id"
+                  id="category_id"
+                  class="select select-bordered w-full"
+                  :disabled="isRefund"
                 >
-                  {{ category.category_name }}
-                </option>
-              </select>
-            </label>
-            <div v-if="errors.category_id" class="text-red-500 text-sm text-right mt-1">
-              {{ errors.category_id }}
+                  <option value="" disabled selected>Select Category</option>
+                  <option
+                    v-for="category in categories"
+                    :value="category.category_id"
+                    :key="category.category_id"
+                  >
+                    {{ category.category_id === 1 ? 'Refund' : category.category_name }}
+                  </option>
+                </select>
+              </label>
+              <div v-if="errors.category_id" class="text-red-500 text-sm text-right mt-1">
+                {{ errors.category_id }}
+              </div>
             </div>
           </div>
-          <div class="mb-2">
+          <!-- Description -->
+          <div class="mb-2 px-4">
             <label class="form-control w-full">
               <div class="label">
                 <span class="label-text font-semibold">Description</span>
@@ -111,11 +105,12 @@
               {{ errors.description }}
             </div>
           </div>
+          <!-- Users -->
           <div class="mb-6">
-            <div class="label">
+            <div class="label px-4">
               <span class="label-text font-semibold">Users</span>
             </div>
-            <div class="form-control">
+            <div class="form-control px-4">
               <label for="shareEqually" class="label cursor-pointer">
                 <span class="label-text">Share expense equally</span>
                 <input
@@ -131,7 +126,7 @@
               <!-- head -->
               <thead>
                 <tr>
-                  <th>Username</th>
+                  <th class="w-1/2">Username</th>
                   <th>Share</th>
                   <th>Action</th>
                   <!-- New column -->
@@ -139,7 +134,7 @@
               </thead>
               <tbody v-if="users">
                 <tr v-for="(user, index) in users" :key="index">
-                  <td>{{ user.username }}</td>
+                  <td class="text-base font-semibold pl-4">&nbsp;@{{ user.username }}</td>
                   <td>
                     <input
                       class="input input-bordered w-full"
@@ -152,36 +147,28 @@
                   </td>
                   <td>
                     <button @click="deleteUser(index)" v-if="!user.isDefault" class="btn">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="feather feather-trash-2"
-                      >
-                        <polyline points="3 6 5 6 21 6"></polyline>
-                        <path
-                          d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m6 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"
-                        ></path>
-                        <line x1="10" y1="11" x2="10" y2="17"></line>
-                        <line x1="14" y1="11" x2="14" y2="17"></line>
-                      </svg>
+                      <IconTrash :size="24" stroke-width="2" />
                     </button>
                   </td>
                 </tr>
               </tbody>
             </table>
+            <!-- Add User Button -->
+            <div class="text-center px-4">
+              <button @click="openDialog" type="button" class="btn mt-2 my-1">
+                <IconUserPlus :size="24" stroke-width="2" />Add User
+              </button>
+            </div>
+
             <div v-if="errors.total_cost" class="text-red-500 text-sm text-right mt-1">
               {{ errors.total_cost }}
             </div>
           </div>
-          <button @click="openDialog" type="button" class="btn w-full">Add User</button>
-          <button type="submit" class="btn w-full mt-4">Edit Expense</button>
+          <div class="px-4">
+          <button type="submit" class="btn w-full mt-4 items-center py-7 content-center text-base">
+            <IconEdit :size="24" stroke-width="2" />
+            Edit Expense</button>
+        </div>
         </form>
       </div>
     </div>
@@ -201,6 +188,7 @@ import { getCategories } from '../lib/api.js'
 import UserDialogComponent from '../components/UserDialogComponent.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getExpense } from '../lib/api'
+import { IconArrowLeft, IconTrash, IconUserPlus, IconEdit } from '@tabler/icons-vue'
 
 // eslint-disable-next-line no-unused-vars
 const emits = defineEmits(['loginSuccess', 'openSidebar'])
@@ -288,12 +276,12 @@ onMounted(async () => {
     expense.value = await getExpense(year, month, id)
     if (expense.value && expense.value.length > 0) {
       expense.value = expense.value[0]
-      
+
       // Check if the expense is of the logged user
-        if (parseInt(expense.value.user_id) !== parseInt(user_id.value)) {
-            // Redirect to the notfound page
-            router.push({ name: 'notfound' })
-        }
+      if (parseInt(expense.value.user_id) !== parseInt(user_id.value)) {
+        // Redirect to the notfound page
+        router.push({ name: 'notfound' })
+      }
 
       const newdate = new Date(expense.value.date)
       date.value = new Date(Date.UTC(newdate.getFullYear(), newdate.getMonth(), newdate.getDate()))
@@ -433,9 +421,8 @@ async function submitForm() {
       users.value = [users.value[0]]
       users.value[0].share = 0 // Reset the share to 0
 
-        // Redirect to the expense detail page, passing the year, month, and id as params
-        router.push({ name: 'expensedetail', params: { year, month, id: expense.expense_id } })
-
+      // Redirect to the expense detail page, passing the year, month, and id as params
+      router.push({ name: 'expensedetail', params: { year, month, id: expense.expense_id } })
     } catch (error) {
       console.error(error)
 

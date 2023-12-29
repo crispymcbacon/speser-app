@@ -7,6 +7,9 @@ const userStore = useUserStore()
 const loading = ref(true)
 const data = ref(null)
 
+// eslint-disable-next-line no-unused-vars
+const emits = defineEmits(['login', 'logout'])
+
 onMounted(async () => {
   const balanceData = await getBalance()
   data.value = balanceData
@@ -15,6 +18,12 @@ onMounted(async () => {
 </script>
 
 <template>
+  <div class="px-4 mt-2">
+    <!-- Header -->
+    <div class="flex flex-row justify-between">
+      <h1 class="text-4xl font-bold mb-2">Home</h1>
+    </div>
+  </div>
   <div class="hero-content text-center">
     <div class="max-w-md">
       <h1 class="text-2xl font-bold mt-2">Welcome back, {{ userStore.first_name }}!</h1>
@@ -36,9 +45,8 @@ onMounted(async () => {
       <p class="py-4">
         You can manage family expenses, share costs with others, track financial balances and
         more.<br />
-        Open the sidebar to access all the functionalities
+        All the functionalities are in the menu at the bottom.
       </p>
-      <button class="btn mt-4" @click="$emit('openSidebar')">Open for me</button>
     </div>
   </div>
 </template>

@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import VueCookies from 'vue-cookies';
 import HomeView from '../views/HomeView.vue'
 import SigninView from '../views/SigninView.vue'
 import SignupView from '../views/SignupView.vue'
@@ -8,10 +9,9 @@ import AddExpenseView from '../views/AddExpenseView.vue'
 import ExpensesView from '../views/ExpensesView.vue'
 import SearchExpenseView from '../views/SearchExpenseView.vue'
 import ExpenseDetailView from '../views/ExpenseDetailView.vue'
-import ExpenseEditViewVue from '../views/ExpenseEditView.vue'
+import ExpenseEditView from '../views/ExpenseEditView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
-
-import VueCookies from 'vue-cookies';
+import UserInfoView from '../views/UserInfoView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -73,7 +73,13 @@ const router = createRouter({
     {
       path: '/expenseedit/:year/:month/:id',
       name: 'expenseedit',
-      component: ExpenseEditViewVue,
+      component: ExpenseEditView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/userinfo',
+      name: 'userinfo',
+      component: UserInfoView,
       meta: { requiresAuth: true }
     },
     {

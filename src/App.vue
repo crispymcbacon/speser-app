@@ -1,78 +1,94 @@
 <script setup>
-import { RouterLink, RouterView} from 'vue-router'
+import { RouterLink, RouterView } from 'vue-router'
 import { ref } from 'vue'
-import VueCookies from 'vue-cookies';
+import VueCookies from 'vue-cookies'
+import {
+  IconHome,
+  IconReceiptEuro,
+  IconCash,
+  IconCirclePlus,
+  IconLogin2,
+  IconUserPlus,
+  IconUserSquareRounded
+} from '@tabler/icons-vue'
 
-let isSidebarOpen = ref(false)
-let isLoggedIn = ref(VueCookies.get('jwt') !== null);
+let isLoggedIn = ref(VueCookies.get('jwt') !== null)
 
 // This needs to be a method so that we can call it from the child component
 // Is needed to update the sidebar state after login
-const handleLoginSuccess = () => {
-  isLoggedIn.value = true;
-};
+const handleLogin = () => {
+  isLoggedIn.value = true
+}
 
-const logout = () => {
+const handleLogout = () => {
   VueCookies.remove('jwt')
-  isLoggedIn.value = false;
-  isSidebarOpen.value = false;
+  isLoggedIn.value = false
 }
 </script>
 
 <template>
-  <div class="drawer">
-    <input id="my-drawer-3" type="checkbox" class="drawer-toggle" v-model="isSidebarOpen"/> 
-    <div class="drawer-content flex flex-col">
-      <header class="navbar bg-base-100">
-        <div class="navbar-start">
-          <div class="flex-none lg:hidden">
-            <label for="my-drawer-3" aria-label="open sidebar" class="btn btn-square btn-ghost">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </label>
-          </div> 
-          <a class="btn btn-ghost text-xl">Finmily</a>
-        </div>
-
-        <div class="navbar-center hidden lg:flex">
-          <ul class="menu menu-horizontal px-1">
-            <li v-if="isLoggedIn"><RouterLink to="/" @click="isSidebarOpen = false">Home</RouterLink></li>
-            <li v-if="isLoggedIn"><RouterLink to="/balance">Balance</RouterLink></li>
-            <li v-if="isLoggedIn"><RouterLink to="/balancetouser">Balance To User</RouterLink></li>
-            <li v-if="!isLoggedIn"><RouterLink to="/signin">Signin</RouterLink></li>
-            <li v-if="!isLoggedIn"><RouterLink to="/signup">Signup</RouterLink></li>
-          </ul>
-        </div>
-
-        <div class="navbar-end">
-          <!-- <a class="btn">Button</a> -->
-        </div>
-      </header>
-
-      <div class="container mx-auto max-w-3xl">
-        <RouterView @login-success="handleLoginSuccess" @openSidebar="isSidebarOpen = true" />
-      </div>
+  <header class="navbar bg-base-100">
+    <div class="navbar-start">
+      <a class="btn btn-ghost text-3xl px-2 text-secondary">Speser</a>
     </div>
-    <div class="drawer-side">
-      <label for="my-drawer-3" aria-label="close sidebar" class="drawer-overlay"></label> 
-      <ul class="menu w-80 min-h-full bg-base-200 text-lg">
-        <li>
-          <h2 class="menu-title text-lg">Menu</h2>
-          <ul>
-            <!-- Sidebar content here -->
-          <li v-if="isLoggedIn"><RouterLink active-class="active" to="/" @click="isSidebarOpen = false">Home</RouterLink></li>
-          <li v-if="isLoggedIn"><RouterLink active-class="active" to="/expenses" @click="isSidebarOpen = false">Expenses</RouterLink></li>
-          <li v-if="isLoggedIn"><RouterLink active-class="active" to="/addexpense" @click="isSidebarOpen = false">Add Expense</RouterLink></li>
-          <li v-if="isLoggedIn"><RouterLink active-class="active" to="/balance" @click="isSidebarOpen = false">Balance</RouterLink></li>
-          <li v-if="isLoggedIn"><RouterLink active-class="active" to="/balancetouser" @click="isSidebarOpen = false">Search user</RouterLink></li>
-          <li v-if="!isLoggedIn"><RouterLink active-class="active" to="/signin" @click="isSidebarOpen = false">Signin</RouterLink></li>
-          <li v-if="!isLoggedIn"><RouterLink  active-class="active" to="/signup" @click="isSidebarOpen = false">Signup</RouterLink></li>
-          <li v-if="isLoggedIn"><a href="#" @click="logout">Logout</a></li>
-          </ul>
-        
-      </li>
+
+    <div class="navbar-center hidden lg:flex">
+      <ul class="menu menu-horizontal hidden px-1">
+        <li v-if="isLoggedIn">
+          <RouterLink to="/">Home</RouterLink>
+        </li>
+        <li v-if="isLoggedIn"><RouterLink to="/balance">Balance</RouterLink></li>
+        <li v-if="isLoggedIn"><RouterLink to="/balancetouser">Balance To User</RouterLink></li>
+        <li v-if="!isLoggedIn"><RouterLink to="/signin">Signin</RouterLink></li>
+        <li v-if="!isLoggedIn"><RouterLink to="/signup">Signup</RouterLink></li>
       </ul>
     </div>
-  
+
+    <div class="navbar-end">
+      <!-- <a class="btn">Button</a> -->
+    </div>
+  </header>
+  <div class="container mx-auto max-w-3xl pb-28">
+    <RouterView @login="handleLogin" @logout="handleLogout" />
   </div>
-  
+
+  <div class="fixed inset-x-0 bottom-0 z-10 pb-2 px-10">
+    <ul class="menu menu-horizontal bg-base-200 rounded-box w-full justify-center px-2 py-4">
+      <li v-if="isLoggedIn">
+        <RouterLink active-class="active" to="/">
+          <IconHome :size="24" stroke-width="2" />
+        </RouterLink>
+      </li>
+      <li v-if="isLoggedIn">
+        <RouterLink active-class="active" to="/expenses">
+          <IconReceiptEuro :size="24" stroke-width="2" />
+        </RouterLink>
+      </li>
+      <li v-if="isLoggedIn">
+        <RouterLink active-class="active" to="/addexpense">
+          <IconCirclePlus :size="24" stroke-width="2" />
+        </RouterLink>
+      </li>
+      <li v-if="isLoggedIn">
+        <RouterLink active-class="active" to="/balance">
+          <IconCash :size="24" stroke-width="2" />
+        </RouterLink>
+      </li>
+      <li v-if="!isLoggedIn">
+        <RouterLink active-class="active" to="/signin">
+          <IconLogin2 :size="24" stroke-width="2" />
+        </RouterLink>
+      </li>
+      <li v-if="!isLoggedIn">
+        <RouterLink active-class="active" to="/signup">
+          <IconUserPlus :size="24" stroke-width="2" />
+        </RouterLink>
+      </li>
+      <li v-if="isLoggedIn">
+        <RouterLink active-class="active" to="/userinfo">
+          <IconUserSquareRounded :size="24" stroke-width="2" />
+        </RouterLink>
+      </li>
+    </ul>
+  </div>
 </template>

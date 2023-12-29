@@ -4,6 +4,7 @@ import { searchUser, getBalanceToUser } from '../lib/api.js'
 import { useUserStore } from '../lib/stores.js'
 import { useToast } from 'vue-toastification'
 import { useRouter } from 'vue-router'
+import { IconArrowLeft } from '@tabler/icons-vue'
 
 let data = ref(null)
 const username = ref('')
@@ -93,21 +94,7 @@ const goToDetail = (expense) => {
     <div class="mt-4">
       <div class="px-4 grid grid-cols-5 items-center">
         <button @click="goBack">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-arrow-left"
-          >
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
+          <IconArrowLeft :size="24" stroke-width="2" />
         </button>
         <h1 class="text-2xl font-bold col-span-3 text-center">Balance to user</h1>
         <div></div>
@@ -121,6 +108,7 @@ const goToDetail = (expense) => {
             type="text"
             class="w-full px-4 input input-bordered"
             placeholder="Search..."
+            autocapitalize="none"
           />
           <!-- <button @click="search" class="px-4 btn uppercase">Search</button> -->
         </div>

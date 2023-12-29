@@ -30,18 +30,27 @@
 <script setup>
 import { ref } from 'vue';
 import { signin } from '../lib/api.js';
-import router from '@/router';
+import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
-const emit = defineEmits(['login-success']);
+const emit = defineEmits(['login']);
 
 let username = ref('');
 let password = ref('');
+const router = useRouter()
+const toast = useToast()
 
 const login = async () => {
     try {
-        await signin(username.value, password.value);
-        emit('login-success'); // Emit event after successful login
-        router.push({ name: 'home' });
+        const response = await signin(username.value, password.value);
+        if (response.status === 'success') {
+            emit('login'); // Emit event after successful login
+            router.push({ name: 'home' });
+        } else {
+            toast.error('Wrong username or password', {
+                hideProgressBar: true
+            })
+        }
     } catch (error) {
         console.log(error);
     }

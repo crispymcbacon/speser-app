@@ -11,6 +11,7 @@
               type="text"
               class="w-full px-4 input input-bordered"
               placeholder="Search..."
+              autocapitalize="none"
             />
 
             <!-- Dropdown list for search results -->

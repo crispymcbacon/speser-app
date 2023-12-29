@@ -68,7 +68,7 @@ export async function signin(username, password) {
         // Return success
         return { status: 'success', message: 'Login successful' };
     } catch (error) {
-        console.error('Error:', error);
+        return { status: 'error', message: 'Wrong credentials' };
     }
 }
 
@@ -202,6 +202,15 @@ export async function searchExpense(query){
 export async function searchUsersOfExpense(query){
     try {
         const response = await sendGETRequest(`/categories/search?q=${query}`);
+        return await response.json();
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+export async function getUserInfo(){
+    try {
+        const response = await sendGETRequest("/budget/whoami");
         return await response.json();
     } catch (error) {
         console.error('Error:', error);
