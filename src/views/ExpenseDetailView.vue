@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getExpense } from '../lib/api'
 import { useUserStore } from '../lib/stores.js'
-import { IconArrowLeft, IconEdit } from '@tabler/icons-vue'
+import { IconArrowLeft, IconEdit, IconCalendar, IconReceipt, IconCategory } from '@tabler/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -61,52 +61,61 @@ const editExpense = () => {
 </script>
 
 <template>
-  <div class="p-4 rounded-xl shadow-md mx-2">
-    <div class="flex justify-between items-center">
-      <button @click="goBack" class="">
-        <IconArrowLeft :size="24" stroke-width="2" />
-      </button>
-      <button @click="editExpense" class="" v-if="isEditable">
-        <IconEdit :size="24" stroke-width="2" />
-      </button>
-    </div>
+  <div class="px-4 mx-2">
     <div v-if="loading" class="text-center">
       <div class="spinner"></div>
       Loading...
     </div>
-    <div class="mt-4" v-else>
-      <div class="text-right text-gray-500">Date: {{ expense.date }}</div>
-      <div class="font-semibold py-1">Description:</div>
-      <div class="">{{ expense.description }}</div>
-      <div class="py-2 font-semibold">
-        Category:
-        <span
+    <div v-else>
+      <div class="flex justify-between items-center mt-4">
+        <button @click="goBack" class="">
+          <IconArrowLeft :size="24" stroke-width="2" />
+        </button>
+        <div class="text-xl font-bold text-center">ID #{{ expense.id }}</div>
+        <button @click="editExpense" class="" v-if="isEditable">
+          <IconEdit :size="24" stroke-width="2" />
+        </button>
+      </div>
+      <div class="flex flex-row items-center text-gray-500 py-1 mt-8">
+        <IconCalendar :size="20" stroke-width="2" class="mr-2" />
+        <div class="">{{ expense.date }}</div>
+      </div>
+      <div class="flex flex-row items-center py-1">
+        <IconReceipt :size="20" stroke-width="2" class="mr-2" />
+        <div class="text-lg font-bold">{{ expense.description }}</div>
+      </div>
+      <div class="flex flex-row items-center py-1 text-gray-500">
+        <IconCategory :size="20" stroke-width="2" class="mr-2" />
+        <div
           :class="{
             'badge badge-neutral': expense.category_id === 1,
             'badge badge-primary': expense.category_id !== 1
           }"
-          >{{ expense.category_name }}</span
         >
+          {{ expense.category_name }}
+        </div>
       </div>
-      <div class="flex justify-between items-center">
-        <div class="font-semibold flex-1">Total Cost:</div>
+      <!-- Total Cost -->
+      <div class="mt-4">
+        <div class="py-1">Total Cost</div>
         <div class="text-3xl font-bold">€{{ expense.total_cost }}</div>
       </div>
-      <div class="font-semibold py-1">Users:</div>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Username</th>
-            <th>Share</th>
-          </tr>
-        </thead>
-        <tbody v-if="expense.users">
-          <tr v-for="(user, index) in expense.users" :key="index">
-            <td class="text-base">{{ user.username }}</td>
-            <td class="text-base">{{ user.share }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- Users -->
+      <div class="mt-1">
+        <div class="flex flex-col">
+          <div class="divider my-2"></div>
+          <div v-for="(user, index) in expense.users" :key="index" class="flex flex-col">
+            <div class="flex flex-row items-center">
+              <div class="flex flex-col ml-2">
+                <div class="font-semibold">{{ user.first_name }} {{ user.last_name }}</div>
+                <div class="grow text-gray-500 text-sm">@{{ user.username }}</div>
+              </div>
+              <div class="grow text-lg text-right font-semibold mr-2">€{{ user.share }}</div>
+            </div>
+            <div class="divider my-2"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
