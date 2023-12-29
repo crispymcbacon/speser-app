@@ -1,6 +1,6 @@
 <template>
   <!-- Header -->
-  <div class="px-4 grid grid-cols-5 items-center">
+  <div class="px-4 grid grid-cols-5 items-center md:px-6">
     <button @click="goBack">
       <IconArrowLeft :size="24" stroke-width="2" />
     </button>
@@ -9,7 +9,7 @@
   </div>
   <!-- Search input -->
   <div class="flex mt-4">
-    <div class="max-w-md w-full">
+    <div class="max-w-md w-full mx-auto">
       <div v-if="loading" class="text-center">
         <div class="spinner"></div>
         Loading...

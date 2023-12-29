@@ -1,5 +1,5 @@
 <template>
-  <div class="px-4 mt-2">
+  <div class="px-4 mt-2 md:px-6">
     <!-- Header -->
     <div class="flex flex-row justify-between">
       <h1 class="text-4xl font-bold mb-2">New Expense</h1>
@@ -7,7 +7,7 @@
   </div>
   <!-- Form -->
   <div class="flex mt-4">
-    <div class="max-w-md w-full">
+    <div class="max-w-md w-full mx-auto">
       <form @submit.prevent="submitForm">
         <!-- Total Cost-->
         <div class="mb-2 px-4">

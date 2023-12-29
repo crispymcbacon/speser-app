@@ -91,14 +91,14 @@ const goToDetail = (expense) => {
 <template>
   <div>
     <div class="mt-4">
-      <div class="px-4 grid grid-cols-5 items-center">
+      <div class="px-4 grid grid-cols-5 items-center md:px-6">
         <button @click="goBack">
           <IconArrowLeft :size="24" stroke-width="2" />
         </button>
         <h1 class="text-2xl font-bold col-span-3 text-center">Balance to user</h1>
         <div></div>
       </div>
-      <div class="mt-6 px-4">
+      <div class="mt-6 px-4 md:px-6">
         <div class="text-lg font-semibold mb-2">Search by username:</div>
         <div class="flex flex-col">
           <input

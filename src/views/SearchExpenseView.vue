@@ -34,7 +34,7 @@ const goToDetail = (expense) => {
 
 <template>
   <div>
-    <div class="mt-2">
+    <div class="mt-2 md:px-2">
       <div class="px-4 grid grid-cols-5 items-center">
         <button @click="goBack">
           <IconArrowLeft :size="24" stroke-width="2" />

@@ -23,7 +23,7 @@ const logout = () => {
 </script>
 
 <template>
-  <div class="px-4 mt-2">
+  <div class="px-4 mt-2 md:px-6">
     <!-- Header -->
     <div class="flex flex-row justify-between">
       <h1 class="text-4xl font-bold mb-2">User settings</h1>
@@ -31,7 +31,7 @@ const logout = () => {
   </div>
   <div>
     <div v-if="loading">Loading...</div>
-    <div v-else class="px-4 mt-4">
+    <div v-else class="px-4 mt-4 md:px-6">
       <div class="label">
         <span class="label-text font-semibold">Logged user</span>
       </div>
