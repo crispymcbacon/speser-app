@@ -1,8 +1,25 @@
 services:
+  # app:
+  #   container_name: app-campagnolo
+  #   build: .
+  #   command: node index.js
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./server:/var/www
+  #   links:
+  #     - "db:dbhost"
+  #   environment:
+  #     - DB_USER=postgres
+  #     - DB_HOST=dbhost
+  #     - DB_DATABASE=family_db
+  #     - DB_PORT=5432
+  #     - DB_SSL=false
+  #     - JWT_SECRET=f21f34146de71fa0eba5cbaacaaf1a5b87040d99e04f1dc037c1e08db24ac39d07bec65cccdb42d0875acf77fab9b5910c5e8c3cdc5d4a58ff5db91a2b24556a
+  #     - JWT_REFRESH_SECRET=a0ae8fee96249d7d03d82d316f5306468ab748c3eec5f3d2779b2dfd034bd32d71e30f628f47f07ce2186d8f13d9c6d71adc1909729626f4721f03976ad4cfb4
   db:
+    container_name: db-campagnolo
     image: postgres
-    #container_name: family_db
-    #restart: always
     user: postgres
     secrets:
       - db-password
@@ -11,8 +28,6 @@ services:
     environment:
       - POSTGRES_DB=family_db
       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
-    #expose:
-    #  - 5432
     ports:
       - 5432:5432
     healthcheck:
@@ -25,4 +40,3 @@ volumes:
 secrets:
   db-password:
     file: ./db/password.txt
-
