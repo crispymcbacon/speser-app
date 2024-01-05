@@ -7,7 +7,7 @@
   </div>
   <!-- Form -->
   <div class="flex mt-4">
-    <div class="max-w-md w-full mx-auto">
+    <div class="max-w-lg w-full mx-auto">
       <form @submit.prevent="submitForm">
         <!-- Total Cost-->
         <div class="mb-2 px-4">

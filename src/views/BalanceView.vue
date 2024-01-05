@@ -32,6 +32,7 @@
         <thead>
           <tr>
             <th></th>
+            <th class="hidden sm:table-cell">Owner</th>
             <th>Description</th>
             <th class="hidden sm:table-cell">Date</th>
             <th>Total Cost</th>
@@ -41,6 +42,9 @@
         <tbody>
           <tr v-for="(expense, index) in data.expenses" :key="index" @click="goToDetail(expense)">
             <th>{{ index + 1 }}</th>
+            <th class="hidden sm:table-cell">
+              {{ expense.user_id }}
+            </th>
             <td>{{ expense.description }}</td>
             <td class="hidden sm:table-cell">
               {{ new Date(expense.date).toLocaleDateString() }}

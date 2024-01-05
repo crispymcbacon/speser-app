@@ -9,7 +9,7 @@
   </div>
   <!-- Search input -->
   <div class="flex mt-4">
-    <div class="max-w-md w-full mx-auto">
+    <div class="max-w-lg w-full mx-auto">
       <div v-if="loading" class="text-center">
         <div class="spinner"></div>
         Loading...

@@ -25,8 +25,8 @@ onMounted(async () => {
     </div>
   </div>
   <div class="hero-content text-center">
-    <div class="max-w-md">
-      <h1 class="text-2xl font-bold mt-2">Welcome back, {{ userStore.first_name }}!</h1>
+    <div class="max-w-lg">
+      <h1 class="text-2xl font-bold mt-2 lg:text-3xl">Welcome back, {{ userStore.first_name }}!</h1>
       <div>
         <div v-if="loading">Loading...</div>
         <div v-else class="px-4 mt-4">

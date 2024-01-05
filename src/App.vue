@@ -38,7 +38,7 @@ const handleLogout = () => {
       </div>
       <!-- Desktop Center -->
       <div class="navbar-center hidden lg:flex">
-        <ul class="menu menu-horizontal px-1">
+        <ul class="menu menu-horizontal px-1 space-x-2">
           <li v-if="isLoggedIn">
             <RouterLink active-class="active" to="/">
               <IconHome :size="24" stroke-width="2" />

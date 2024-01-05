@@ -1,66 +1,77 @@
 <template>
-    <div class="px-4 mt-2 md:px-6">
-      <!-- Header -->
-      <div class="flex flex-row justify-between">
-        <h1 class="text-4xl font-bold mb-2 lg:text-5xl">Expenses</h1>
-        <button class="px-2">
-          <RouterLink active-class="active" to="/searchexpense">
-            <IconSearch :size="28" stroke-width="3" />
-          </RouterLink>
-        </button>
-      </div>
-      <!-- Filters -->
-      <div class="mt-4">
-        <div class="flex flex-row space-x-4">
-          <div class="form-control grow">
-            <label for="yearToggle" class="label cursor-pointer">
-              <span class="label-text">Filter by Year</span>
-              <input id="yearToggle" v-model="yearToggle" type="checkbox" class="toggle" />
-            </label>
-            <select id="year" v-model="selectedYear" :disabled="!yearToggle">
-              <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
-            </select>
-          </div>
-          <div class="form-control grow">
-            <label for="monthToggle" class="label cursor-pointer">
-              <span class="label-text">Filter by Month</span>
-              <input id="monthToggle" v-model="monthToggle" type="checkbox" class="toggle" />
-            </label>
-            <select id="month" v-model="selectedMonth" :disabled="!monthToggle">
-              <option v-for="month in months" :key="month" :value="month">{{ month }}</option>
-            </select>
-          </div>
+  <div class="px-4 mt-2 md:px-6">
+    <!-- Header -->
+    <div class="flex flex-row justify-between">
+      <h1 class="text-4xl font-bold mb-2 lg:text-5xl">Expenses</h1>
+      <button class="px-2">
+        <RouterLink active-class="active" to="/searchexpense">
+          <IconSearch :size="28" stroke-width="3" />
+        </RouterLink>
+      </button>
+    </div>
+    <!-- Filters -->
+    <div class="mt-4">
+      <div class="flex flex-row space-x-4">
+        <div class="form-control grow">
+          <label for="yearToggle" class="label cursor-pointer">
+            <span class="label-text">Filter by Year</span>
+            <input id="yearToggle" v-model="yearToggle" type="checkbox" class="toggle" />
+          </label>
+          <select id="year" v-model="selectedYear" :disabled="!yearToggle">
+            <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
+          </select>
+        </div>
+        <div class="form-control grow">
+          <label for="monthToggle" class="label cursor-pointer">
+            <span class="label-text">Filter by Month</span>
+            <input id="monthToggle" v-model="monthToggle" type="checkbox" class="toggle" />
+          </label>
+          <select id="month" v-model="selectedMonth" :disabled="!monthToggle">
+            <option v-for="month in months" :key="month" :value="month">{{ month }}</option>
+          </select>
         </div>
       </div>
     </div>
-    <!-- Expenses -->
-    <div v-if="loading">Loading...</div>
-    <div v-else>
-      <div class="overflow-x-auto mt-4">
-        <table class="table table-zebra">
-          <!-- head -->
-          <thead>
-            <tr>
-              <th></th>
-              <th>Description</th>
-              <th class="hidden sm:table-cell">Date</th>
-              <th>Total Cost</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(expense, index) in data" :key="index" @click="goToDetail(expense)">
-              <th>{{ index + 1 }}</th>
-              <td>{{ expense.description }}</td>
-              <td class="hidden sm:table-cell">
-                {{ new Date(expense.date).toLocaleDateString() }}
-              </td>
-              <td>{{ expense.total_cost }}</td>
-              <!-- <td :class="balanceColor(expense.balance)">{{ expense.balance }}</td> -->
-            </tr>
-          </tbody>
-        </table>
-      </div>
+  </div>
+  <!-- Expenses -->
+  <div v-if="loading">Loading...</div>
+  <div v-else>
+    <div class="overflow-x-auto mt-4">
+      <table class="table table-zebra">
+        <!-- head -->
+        <thead>
+          <tr>
+            <th></th>
+            <th class="hidden sm:table-cell">Category</th>
+            <th>Description</th>
+            <th class="hidden sm:table-cell">Date</th>
+            <th>Total Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(expense, index) in data" :key="index" @click="goToDetail(expense)">
+            <th>{{ index + 1 }}</th>
+            <th class="hidden sm:table-cell">
+              <div
+                :class="{
+                  'badge badge-neutral w-24': expense.category_id === 1,
+                  'badge badge-primary w-24 text-base-200': expense.category_id !== 1
+                }"
+              >
+                {{ expense.category_name }}
+              </div>
+            </th>
+            <td>{{ expense.description }}</td>
+            <td class="hidden sm:table-cell">
+              {{ new Date(expense.date).toLocaleDateString() }}
+            </td>
+            <td :class="{ 'text-gray-400': expense.category_id === 1 }">{{ expense.total_cost }}</td>
+            <!-- <td :class="balanceColor(expense.balance)">{{ expense.balance }}</td> -->
+          </tr>
+        </tbody>
+      </table>
     </div>
+  </div>
 </template>
 
 <script setup>
@@ -91,6 +102,7 @@ const fetchExpenses = async () => {
     monthToggle.value ? selectedMonth.value : undefined
   )
   loading.value = false
+  console.log(data.value)
 }
 
 onMounted(fetchExpenses)

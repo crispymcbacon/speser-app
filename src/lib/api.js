@@ -1,7 +1,8 @@
 import VueCookies from 'vue-cookies';
 import { useUserStore } from '../lib/stores.js';
 
-const api_url = '/api';
+//const api_url = '/api';
+const api_url = 'http://localhost:3000/api';
 
 function sendGETRequest(url) {
     return fetch(api_url+url, {

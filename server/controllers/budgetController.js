@@ -101,7 +101,10 @@ export const getUserExpenses = async (req, res) => {
     const user_id = req.user_id // Get the user ID from the request
 
     const result = await db.query(
-      'SELECT * FROM expenses WHERE user_id = $1', // Query to fetch expenses for the user
+      `SELECT expenses.*, categories.name AS category_name 
+       FROM expenses 
+       LEFT JOIN categories ON expenses.category_id = categories.id 
+       WHERE user_id = $1`, // Query to fetch expenses for the user with category name
       [user_id]
     )
 
@@ -348,7 +351,6 @@ export const getUserBalance = async (req, res) => {
       WHERE 
          es.user_id = $1;
     `
-    // e.user_id = $1 OR es.user_id = $1; OLD QUERY
 
     const result = await db.query(query, [user_id])
     const expenses = result.rows // Get the expenses from the query result
