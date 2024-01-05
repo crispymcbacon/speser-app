@@ -39,7 +39,7 @@ const goToDetail = (expense) => {
         <button @click="goBack">
           <IconArrowLeft :size="24" stroke-width="2" />
         </button>
-        <h1 class="text-2xl font-bold col-span-3 text-center">Search expenses</h1>
+        <h1 class="text-2xl font-bold col-span-3 text-center lg:text-3xl">Search expenses</h1>
         <div></div>
       </div>
       <div class="mt-6 px-4">

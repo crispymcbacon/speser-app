@@ -26,16 +26,16 @@ const logout = () => {
   <div class="px-4 mt-2 md:px-6">
     <!-- Header -->
     <div class="flex flex-row justify-between">
-      <h1 class="text-4xl font-bold mb-2">User settings</h1>
+      <h1 class="text-4xl font-bold mb-2 lg:text-5xl">User settings</h1>
     </div>
   </div>
   <div>
     <div v-if="loading">Loading...</div>
     <div v-else class="px-4 mt-4 md:px-6">
-      <div class="label">
+      <div class="label md:justify-center md:mb-4">
         <span class="label-text font-semibold">Logged user</span>
       </div>
-      <div class="flex flex-row items-center mt-2">
+      <div class="flex flex-row items-center mt-2 justify-center">
         <div class="avatar placeholder">
           <div class="bg-neutral text-neutral-content rounded-full w-24">
             <span class="text-3xl">{{ user.first_name.charAt(0) + user.last_name.charAt(0) }}</span>

@@ -2,7 +2,7 @@
   <div class="px-4 mt-2 md:px-6">
     <!-- Header -->
     <div class="flex flex-row justify-between">
-      <h1 class="text-4xl font-bold mb-2">Balance</h1>
+      <h1 class="text-4xl font-bold mb-2 lg:text-5xl">Balance</h1>
       <button class="px-2">
         <RouterLink active-class="active" to="/balancetouser">
           <IconUserSearch :size="28" stroke-width="2" />

@@ -1,8 +1,8 @@
 <template>
     <div class="flex mt-4">
-        <div class="max-w-md w-full">
+        <div class="max-w-md w-full mx-auto">
             <div class="px-4">
-                <h1 class="text-4xl font-bold mb-6">Signin</h1>
+                <h1 class="text-4xl font-bold mb-6 lg:text-5xl">Signin</h1>
             </div>
             <form @submit.prevent="login" class="px-4 text-center">
                 <div class="mb-2">

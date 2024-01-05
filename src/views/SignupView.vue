@@ -1,8 +1,8 @@
 <template>
     <div class="flex mt-4">
-        <div class="max-w-md w-full">
+        <div class="max-w-md w-full mx-auto">
             <div class="px-4">
-                <h1 class="text-4xl font-bold mb-6">Signup</h1>
+                <h1 class="text-4xl font-bold mb-6 lg:text-5xl">Signup</h1>
             </div>
             <form @submit.prevent="register" class="px-4 text-center">
                 <div class="mb-2">
@@ -32,7 +32,7 @@
                         <div class="label">
                             <span class="label-text">Username</span>
                         </div>
-                        <input v-model="username" type="text" id="username" placeholder="myuser" class="input input-bordered w-full" />
+                        <input v-model="username" type="text" id="username" placeholder="myuser" class="input input-bordered w-full" autocapitalize="none"/>
                     </label>
                     <!-- Add this line to display username errors -->
                     <div v-if="errors.username" class="text-red-500 text-sm text-right mt-1">{{ errors.username }}</div>

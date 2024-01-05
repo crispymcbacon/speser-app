@@ -1,7 +1,7 @@
 <template>
   <div v-if="isOpen" class="fixed inset-0 flex justify-center items-center z-50">
     <div class="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50">
-      <div class="card bg-base-100 rounded shadow-xl w-full mx-4">
+      <div class="card bg-base-100 rounded shadow-xl w-full mx-4 max-w-3xl">
         <div class="card-body">
           <form @submit.prevent="submitForm">
             <h2 class="card-title mb-6">Search an user</h2>
