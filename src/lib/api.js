@@ -1,8 +1,8 @@
 import VueCookies from 'vue-cookies'
 import { useUserStore } from '../lib/stores.js'
 
-//const api_url = '/api'; // PRODUCTION
-const api_url = 'http://localhost:3000/api' // DEVELOPMENT
+const api_url = '/api'; // PRODUCTION
+//const api_url = 'http://localhost:3000/api' // DEVELOPMENT
 
 // ------ Generic functions ------------------------------------------------------
 

@@ -81,7 +81,7 @@
 import { ref, onMounted } from 'vue'
 import { getBalance } from '@/lib/api.js'
 import { useRouter } from 'vue-router'
-import { IconUserSearch } from '@tabler/icons-vue'
+import { IconUserSearch, IconLoader2 } from '@tabler/icons-vue'
 
 const loading = ref(true)
 const data = ref(null)
@@ -113,7 +113,6 @@ function balanceColor(balance) {
 
 // Go to expense detail
 const goToDetail = (expense) => {
-  console.log(expense)
   const year = new Date(expense.date).getFullYear()
   const month = new Date(expense.date).getMonth() + 1
   const id = expense.expense_id

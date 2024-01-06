@@ -161,9 +161,6 @@
                 <IconUserPlus :size="24" stroke-width="2" />Add User
               </button>
             </div>
-            <div v-if="errors.total_cost" class="text-red-500 text-sm text-right mt-1">
-              {{ errors.total_cost }}
-            </div>
           </div>
           <!-- Submit Button -->
           <div class="px-4">
@@ -194,7 +191,7 @@ import { getCategories } from '../lib/api.js'
 import UserDialogComponent from '../components/UserDialogComponent.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getExpense } from '../lib/api'
-import { IconArrowLeft, IconTrash, IconUserPlus, IconEdit } from '@tabler/icons-vue'
+import { IconArrowLeft, IconTrash, IconUserPlus, IconEdit, IconLoader2 } from '@tabler/icons-vue'
 
 // eslint-disable-next-line no-unused-vars
 const emits = defineEmits(['login', 'logout'])
@@ -400,7 +397,6 @@ async function submitForm() {
     }
   } else {
     // Map the errors to the corresponding fields
-    console.log(result.errors)
     errors.value = result.errors.reduce((acc, error) => {
       if (error.field === 'password') {
         // handle password error
@@ -436,13 +432,10 @@ const handleClose = (user) => {
       //user.share = userShare.value
       users.value.push(user)
     } else {
-      console.log('User already exists in the list')
       toast.error('User already exists in the list', {
         hideProgressBar: true
       })
     }
-  } else {
-    console.log('No user selected')
   }
   isDialogOpen.value = false
 }

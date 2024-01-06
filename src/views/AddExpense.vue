@@ -151,9 +151,6 @@
               <IconUserPlus :size="24" stroke-width="2" />Add User
             </button>
           </div>
-          <div v-if="errors.total_cost" class="text-red-500 text-sm text-right mt-1">
-            {{ errors.total_cost }}
-          </div>
         </div>
         <!-- Submit -->
         <div class="px-4">
@@ -283,6 +280,7 @@ async function submitForm() {
     total_cost.value,
     description.value
   )
+  console.log(result)
   if (result.status === 'validated') {
     const sumOfShares = users.value.reduce((sum, user) => sum + parseFloat(user.share), 0) // Calculate the sum of all user shares
 
@@ -373,8 +371,6 @@ const handleClose = (user) => {
         hideProgressBar: true
       })
     }
-  } else {
-    console.log('No user selected')
   }
   isDialogOpen.value = false
 }

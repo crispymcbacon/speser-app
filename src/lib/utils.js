@@ -28,8 +28,6 @@ export async function validateRegistrationInput(username, firstName, lastName, p
 
   // Only allow lowercase alphanumeric characters and underscores in the username
   const usernameRegex = /^[a-z0-9_]+$/
-  console.log(username)
-  console.log(usernameRegex.test(username))
   if (!usernameRegex.test(username)) {
     errors.push({
       status: 'error',
@@ -96,7 +94,7 @@ export async function validateExpenseInput(date, category_id, total_cost, descri
   if (!category_id) {
     errors.push({ status: 'error', message: 'Category ID is required', field: 'category_id' })
   }
-  if (total_cost === undefined || total_cost === null) {
+  if (total_cost === undefined || total_cost === null || total_cost === '') {
     // because total_cost can be 0
     errors.push({ status: 'error', message: 'Total Cost is required', field: 'total_cost' })
   }
