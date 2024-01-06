@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
+// Define a store to save the user data
 export const useUserStore = defineStore('user', () => {
     const user_id = ref(localStorage.getItem('user_id') || '');
     const username = ref(localStorage.getItem('username') || '');

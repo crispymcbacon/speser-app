@@ -1,13 +1,10 @@
 import './assets/app.css'
-
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-
 import App from './App.vue'
 import router from './lib/router'
-
 import Toast from "vue-toastification";
-import "vue-toastification/dist/index.css";
+import "vue-toastification/dist/index.css"; // Toast css
 
 const app = createApp(App)
 

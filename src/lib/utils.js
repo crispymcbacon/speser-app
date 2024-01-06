@@ -111,6 +111,3 @@ export async function validateExpenseInput(date, category_id, total_cost, descri
   }
 }
 
-
-// DIALOG ----------------------------------------------------------------------
-
