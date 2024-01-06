@@ -1,3 +1,4 @@
+// Validate input for login and registration
 export async function validateRegistrationInput(username, firstName, lastName, password) {
   const errors = []
 
@@ -79,6 +80,7 @@ export async function validateRegistrationInput(username, firstName, lastName, p
   }
 }
 
+// Validate input for the expense form
 export async function validateExpenseInput(date, category_id, total_cost, description) {
   const errors = []
 
@@ -108,3 +110,7 @@ export async function validateExpenseInput(date, category_id, total_cost, descri
     errors
   }
 }
+
+
+// DIALOG ----------------------------------------------------------------------
+

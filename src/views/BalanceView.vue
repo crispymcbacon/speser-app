@@ -10,7 +10,14 @@
       </button>
     </div>
   </div>
-  <div v-if="loading">Loading...</div>
+  <!-- Loading -->
+  <div v-if="loading" class="mx-auto flex justify-center h-[60vh]">
+    <div class="text-lg font-semibold flex flex-row items-center">
+      <IconLoader2 class="animate-spin mr-2" :size="28" stroke-width="2" />
+      Loading...
+    </div>
+  </div>
+  <!-- Content -->
   <div v-else>
     <!-- Stats -->
     <div>
@@ -40,6 +47,7 @@
             <th>Balance</th>
           </tr>
         </thead>
+        <!-- body -->
         <tbody class="cursor-pointer">
           <tr v-for="(expense, index) in data.expenses" :key="index" @click="goToDetail(expense)">
             <th>{{ index + 1 }}</th>
@@ -53,7 +61,7 @@
                 {{ expense.category_name }}
               </div>
             </th>
-            <th :class="{ 'text-gray-400': expense.is_own_expense }">
+            <th :class="{ 'text-gray-400': expense.is_own_expense }" class="hidden sm:table-cell">
               @{{ expense.owner_username }}
             </th>
             <td>{{ expense.description }}</td>
@@ -71,7 +79,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getBalance } from '../lib/api.js'
+import { getBalance } from '@/lib/api.js'
 import { useRouter } from 'vue-router'
 import { IconUserSearch } from '@tabler/icons-vue'
 
@@ -83,12 +91,15 @@ const router = useRouter()
 const emits = defineEmits(['login', 'logout'])
 
 onMounted(async () => {
-  const balanceData = await getBalance()
-  data.value = balanceData
-  loading.value = false
-  console.log(data.value)
+  try {
+    data.value = await getBalance() // Get balance data
+    loading.value = false
+  } catch (error) {
+    console.error('Failed to fetch balance:', error)
+  }
 })
 
+// Color the balance text
 function balanceColor(balance) {
   balance = balance.toString()
   if (balance.includes('Debit') || balance.includes('Paid')) {
@@ -100,15 +111,7 @@ function balanceColor(balance) {
   }
 }
 
-function balanceText(balance) {
-  balance = balance.toString()
-  if (balance.includes('Debit') || balance.includes('Credit') || balance.includes('Refund')) {
-    return balance
-  } else {
-    return 'Done'
-  }
-}
-
+// Go to expense detail
 const goToDetail = (expense) => {
   console.log(expense)
   const year = new Date(expense.date).getFullYear()

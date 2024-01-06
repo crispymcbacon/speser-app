@@ -150,26 +150,31 @@ const search = async () => {
   }
 }
 
-// Select user from the dropdown list
 const selectUser = async (user) => {
-  username.value = user.username // set username to the clicked username
-  searchQuery.value = user.username // set searchQuery to the clicked username
-  searchResults.value = [] // clear search results
+  try {
+    username.value = user.username // set username to the clicked username
+    searchQuery.value = user.username // set searchQuery to the clicked username
+    searchResults.value = [] // clear search results
 
-  if (searchQuery.value === logged_username.value) { // if the selected user is the logged-in user
-    toast.error('You cannot search for the logged-in user.', {
+    if (searchQuery.value === logged_username.value) { // if the selected user is the logged-in user
+      toast.error('You cannot search for the logged-in user.', {
+        hideProgressBar: true
+      })
+      return
+    }
+
+    const res = await getBalanceToUser(user.id) // get balance to user
+    if (res.length === 0) { // check if the user has expenses
+      data.value = []
+    } else {
+      data.value = res
+      data.value.totalBalance = balanceLabel(res.totalBalance)
+    }
+  } catch (error) {
+    console.error(error)
+    toast.error('An error occurred while selecting the user.', {
       hideProgressBar: true
     })
-    return
-  }
-
-  const res = await getBalanceToUser(user.id) // get balance to user
-  if (res.length === 0) { // check if the user has expenses
-    data.value = []
-  } else {
-    data.value = res
-    console.log(data.value)
-    data.value.totalBalance = balanceLabel(res.totalBalance)
   }
 }
 

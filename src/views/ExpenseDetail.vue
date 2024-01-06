@@ -21,29 +21,32 @@
         <div v-else></div>
       </div>
       <!-- Expense -->
-      <div class="px-2 max-w-lg mx-auto">
-        <div class="flex flex-row items-center text-gray-500 py-1 mt-8">
-          <IconCalendar :size="20" stroke-width="2" class="mr-2" />
-          <div class="">{{ expense.date }}</div>
-        </div>
-        <div class="flex flex-row items-center py-1">
-          <IconReceipt :size="20" stroke-width="2" class="mr-2" />
-          <div class="text-lg font-bold">{{ expense.description }}</div>
-        </div>
-        <div class="flex flex-row items-center py-1">
-          <IconCategory :size="20" stroke-width="2" class="mr-2" />
-          <div
-            :class="{
-              'badge badge-neutral': expense.category_id === 1,
-              'badge badge-primary text-base-200': expense.category_id !== 1
-            }"
-          >
-            {{ expense.category_name }}
+      <div class="px-4 max-w-lg mx-auto">
+        <!-- Date, Description, Category, Owner -->
+        <div class="px-2">
+          <div class="flex flex-row items-center text-gray-500 py-1 mt-8">
+            <IconCalendar :size="20" stroke-width="2" class="mr-2" />
+            <div class="">{{ expense.date }}</div>
           </div>
-        </div>
-        <div class="flex flex-row items-center py-1 font-semibold">
-          <IconUser :size="20" stroke-width="2" class="mr-2" />
-          @{{ expense.owner_username }}
+          <div class="flex flex-row items-center py-1">
+            <IconReceipt :size="20" stroke-width="2" class="mr-2" />
+            <div class="text-lg font-bold">{{ expense.description }}</div>
+          </div>
+          <div class="flex flex-row items-center py-1">
+            <IconCategory :size="20" stroke-width="2" class="mr-2" />
+            <div
+              :class="{
+                'badge badge-neutral': expense.category_id === 1,
+                'badge badge-primary text-base-200': expense.category_id !== 1
+              }"
+            >
+              {{ expense.category_name }}
+            </div>
+          </div>
+          <div class="flex flex-row items-center py-1 font-semibold">
+            <IconUser :size="20" stroke-width="2" class="mr-2" />
+            @{{ expense.owner_username }}
+          </div>
         </div>
         <!-- Total Cost -->
         <div class="mt-4">
@@ -74,8 +77,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getExpense } from '../lib/api'
-import { useUserStore } from '../lib/stores.js'
+import { getExpense } from '@/lib/api'
+import { useUserStore } from '@/lib/stores'
 import {
   IconArrowLeft,
   IconEdit,
@@ -86,56 +89,51 @@ import {
   IconLoader2
 } from '@tabler/icons-vue'
 
-const route = useRoute()
+const route = useRoute() 
 const router = useRouter()
 const year = route.params.year
 const month = route.params.month
 const id = route.params.id
-
 const loading = ref(true)
 const expense = ref(null)
-
-const user_id = ref('')
 const isEditable = ref(false)
 
-const goBack = () => {
-  router.back()
-}
-
+// Load expense
 onMounted(async () => {
   try {
-    expense.value = await getExpense(year, month, id)
-    expense.value = expense.value[0]
-    console.log(expense.value)
-    loading.value = false
+    expense.value = await getExpense(year, month, id) // Get expense
+    expense.value = expense.value[0] // Get the first element of the array in case of multiple results
 
-    // get only day month and year from date
-    const date = new Date(expense.value.date)
-    expense.value.date = date.toLocaleDateString('en-GB', {
+    const date = new Date(expense.value.date) // Convert date to Date object
+    expense.value.date = date.toLocaleDateString('en-GB', { // get only day month and year from date
       day: 'numeric',
       month: 'short',
       year: 'numeric'
     })
 
-    // check if the expese is of the logged user
     const userStore = useUserStore()
-    user_id.value = userStore.user_id
-    if (parseInt(expense.value.user_id) === parseInt(user_id.value)) {
-      isEditable.value = true
+    if (parseInt(expense.value.user_id) === parseInt(userStore.user_id)) { // check if the expese is of the logged user
+      isEditable.value = true // Show edit button
     }
 
-    // If the expense is a refund, adjust the shares of the users
-    if (parseInt(expense.value.category_id) === 1) {
+    if (parseInt(expense.value.category_id) === 1) { // If the expense is a refund, adjust the shares of the users
       for (let i = 1; i < expense.value.users.length; i++) {
         expense.value.users[i].share = -parseFloat(expense.value.users[i].share)
       }
     }
+
+    loading.value = false // Hide loading
   } catch (error) {
     console.error(error)
-    loading.value = false
   }
 })
 
+// Go back
+const goBack = () => {
+  router.back()
+}
+
+// Edit expense
 const editExpense = () => {
   router.push({ name: 'expenseedit', params: { year, month, id } })
 }

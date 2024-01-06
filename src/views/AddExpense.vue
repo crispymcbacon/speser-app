@@ -28,7 +28,6 @@
               class="input input-bordered w-full"
             />
           </label>
-
           <div v-if="errors.total_cost" class="text-red-500 text-sm text-right mt-1">
             {{ errors.total_cost }}
           </div>
@@ -71,7 +70,7 @@
                   :value="category.category_id"
                   :key="category.category_id"
                 >
-                {{ category.category_id === 1 ? 'Refund' : category.category_name }}
+                  {{ category.category_id === 1 ? 'Refund' : category.category_name }}
                 </option>
               </select>
             </label>
@@ -122,9 +121,9 @@
                 <th class="sm:w-1/2">Username</th>
                 <th>Share</th>
                 <th>Action</th>
-                <!-- New column -->
               </tr>
             </thead>
+            <!-- body -->
             <tbody v-if="users">
               <tr v-for="(user, index) in users" :key="index">
                 <td class="text-base font-semibold pl-4">&nbsp;@{{ user.username }}</td>
@@ -152,16 +151,16 @@
               <IconUserPlus :size="24" stroke-width="2" />Add User
             </button>
           </div>
-
           <div v-if="errors.total_cost" class="text-red-500 text-sm text-right mt-1">
             {{ errors.total_cost }}
           </div>
         </div>
-
+        <!-- Submit -->
         <div class="px-4">
           <button type="submit" class="btn w-full mt-4 items-center py-7 content-center text-base">
             <IconPlus :size="28" stroke-width="2" />
-            Add Expense</button>
+            Add Expense
+          </button>
         </div>
       </form>
     </div>
@@ -173,13 +172,12 @@
 
 <script setup>
 import { ref, defineEmits, onMounted, watch } from 'vue'
-import { addExpense } from '../lib/api.js'
+import { addExpense, getCategories } from '@/lib/api.js'
 import { useToast } from 'vue-toastification'
-import { useUserStore } from '../lib/stores.js'
-import { validateExpenseInput } from '../lib/utils.js'
-import { getCategories } from '../lib/api.js'
-import UserDialogComponent from '../components/UserDialogComponent.vue'
+import { useUserStore } from '@/lib/stores.js'
+import { validateExpenseInput } from '@/lib/utils.js'
 import { IconUserPlus, IconTrash, IconPlus } from '@tabler/icons-vue'
+import UserDialogComponent from '@/components/UserDialogComponent.vue'
 
 // eslint-disable-next-line no-unused-vars
 const emits = defineEmits(['login', 'logout'])
@@ -192,167 +190,128 @@ const total_cost = ref('')
 const errors = ref({})
 const users = ref([])
 const shareEqually = ref(true)
-const $toast = useToast()
+const toast = useToast()
 const isRefund = ref(false)
 const isDialogOpen = ref(false)
 const categories = ref([])
 
-// Track refund
+onMounted(async () => {
+  try {
+    const userStore = useUserStore()
+    user_id.value = parseInt(userStore.user_id) // Get user_id from store
+
+    // Set the current date
+    const today = new Date()
+    const month = String(today.getMonth() + 1).padStart(2, '0') // Months are 0-indexed, so we need to add 1
+    const day = String(today.getDate()).padStart(2, '0')
+    date.value = today.getFullYear() + '-' + month + '-' + day
+
+    categories.value = await getCategories() // Get categories
+    categories.value.shift() // Remove the first category (id = 1) from the list, as it is the Refund category
+
+    const userExists = users.value.some(
+      // Check if the user is not already in the list
+      (existingUser) => parseInt(existingUser.id) === parseInt(user_id.value)
+    )
+    if (!userExists) {
+      // If not, add the user to the list
+      users.value.push({ id: user_id.value, username: userStore.username, isDefault: true })
+    }
+  } catch (error) {
+    console.error(error)
+  }
+})
+
+// Track refund checkbox
 watch(isRefund, (newVal) => {
   if (newVal) {
+    // If is a refund
     total_cost.value = 0
-    category_id.value = 1
+    category_id.value = 1 // Set category to Refund
     shareEqually.value = false
   }
 })
 
-// Define dialog state and content
-
-// Define dialog actions
-
-// Define a method to open the dialog
-const openDialog = () => {
-  isDialogOpen.value = true
-}
-
-// Watch for changes in users array, isRefund, and shareEqually
+// Track shareEqually checkbox
 watch(
   [users, total_cost, isRefund, shareEqually],
   ([newUsers, newTotalCost, newIsRefund, newShareEqually]) => {
     if (newIsRefund) {
+      // If is a refund, calculate the shares
       if (!newShareEqually && newUsers.length > 1) {
-        // 1 because the disabled user is always present
-        // Calculate the sum of shares for all users other than the disabled one
+        // 1 because the logged user is always present
+        // Calculate the sum of shares for all users other than the logged one
         let sumOfOtherShares = 0
         for (let i = 1; i < newUsers.length; i++) {
           sumOfOtherShares += parseFloat(newUsers[i].share || 0)
         }
-        console.log(sumOfOtherShares)
-        // Update the share for the disabled user (expected to be at index 0)
-        newUsers[0].share = (-sumOfOtherShares).toFixed(2)
+        // Update the share for the logged user (expected to be the first one)
+        newUsers[0].share = (-sumOfOtherShares).toFixed(2) // Negative because it is a refund
       }
 
-      // Add the category Refund to categories with category_id = 1
+      // Force Refund to categories with category_id = 1
       const refundCategory = {
         category_id: 1,
         category_name: 'Refund'
       }
       categories.value.unshift(refundCategory)
     } else {
+      // If is not a refund, calculate the equal share
       if (newShareEqually && newTotalCost && newUsers.length > 0) {
-        const equalShare = (parseFloat(newTotalCost) / newUsers.length).toFixed(2)
-        newUsers.forEach((user) => (user.share = equalShare))
+        // 0 because the logged user is always present
+        const equalShare = (parseFloat(newTotalCost) / newUsers.length).toFixed(2) // Calculate the equal share
+        newUsers.forEach((user) => (user.share = equalShare)) // Update the share for all users
       }
-
       // Remove the category Refund from categories
       categories.value.shift()
     }
   },
-  { deep: true }
+  { deep: true } // Watch nested properties of objects (users)
 )
 
-// When the component is mounted, get the user_id from the store
-onMounted(() => {
-  const userStore = useUserStore()
-  user_id.value = userStore.user_id
-
-  // Set the current date
-  const today = new Date()
-  const month = String(today.getMonth() + 1).padStart(2, '0') // Months are 0-indexed, so we need to add 1
-  const day = String(today.getDate()).padStart(2, '0')
-  const output = today.getFullYear() + '-' + month + '-' + day
-  date.value = output
-
-  // Check if the user is not already in the list
-  const userExists = users.value.some((existingUser) => existingUser.id === user_id.value)
-
-  // Get Categories
-  getCategories().then((response) => {
-    categories.value = response
-    // Remove the first category (id = 1) from the list, as it is the Refund category
-    categories.value.shift()
-  })
-
-  if (!userExists) {
-    // Add current user to the list
-    users.value.push({ id: user_id.value, username: userStore.username, isDefault: true })
-    console.log(users.value)
-  }
-})
-
-const handleClose = (user) => {
-  if (typeof user === 'object' && user && user.id) {
-    const userExists = users.value.some((existingUser) => existingUser.id === user.id)
-
-    if (!userExists) {
-      // Add share property to the user
-      //user.share = userShare.value
-      users.value.push(user)
-    } else {
-      console.log('User already exists in the list')
-      $toast.error('User already exists in the list', {
-        hideProgressBar: true
-      })
-    }
-  } else {
-    console.log('No user selected')
-  }
-  isDialogOpen.value = false
-}
-
+// Define a method to delete a user from the list
 const deleteUser = (index) => {
-  if (users.value[index].isDefault) {
-    console.log('Default user cannot be deleted')
-    return
-  }
   users.value.splice(index, 1)
 }
 
+// Add the expense
 async function submitForm() {
-  console.log(total_cost.value)
   const result = await validateExpenseInput(
+    // Validate the input
     date.value,
     category_id.value,
     total_cost.value,
     description.value
   )
   if (result.status === 'validated') {
-    // Calculate the sum of all user shares
-    const sumOfShares = users.value.reduce((sum, user) => sum + parseFloat(user.share), 0)
+    const sumOfShares = users.value.reduce((sum, user) => sum + parseFloat(user.share), 0) // Calculate the sum of all user shares
 
-    // Define an acceptable error margin
-    const epsilon = 0.01
-
-    // Compare the sum of shares with the total cost
+    const epsilon = 0.01 // Define an acceptable error margin (es. case 3.333)
     if (Math.abs(sumOfShares - parseFloat(total_cost.value)) > epsilon) {
-      // Set an error message and return from the function
-      $toast.error('The sum of shares does not equal the total cost.', {
+      // Compare the sum of shares with the total cost
+      toast.error('The sum of shares does not equal the total cost.', {
         hideProgressBar: true
       })
       return
     }
 
-    // Get user_id from store
-    const userStore = useUserStore()
-    user_id.value = parseInt(userStore.user_id)
-
     const expense = {
+      // Create the expense object
       user_id: user_id.value,
       date: date.value,
       description: description.value,
       category_id: category_id.value,
       total_cost: total_cost.value,
-      // Include the shares of each user
-      users: users.value.map((user) => ({ user_id: user.id, share: user.share }))
+      users: users.value.map((user) => ({ user_id: user.id, share: user.share })) // Map the users to the corresponding user_id and share
     }
-
-    console.log(expense)
 
     try {
       const dateObject = new Date(date.value)
       const year = dateObject.getFullYear()
       const month = dateObject.getMonth() + 1 // JavaScript months are 0-indexed
-      const response = await addExpense(
+
+      await addExpense(
+        // Add the expense
         year,
         month,
         expense.user_id,
@@ -361,11 +320,8 @@ async function submitForm() {
         expense.total_cost,
         expense.users
       )
-      console.log(response)
 
-      // Add toast notification here
-      const $toast = useToast()
-      $toast.success('Expense added successfully!', {
+      toast.success('Expense added successfully!', {
         hideProgressBar: true
       })
 
@@ -375,21 +331,18 @@ async function submitForm() {
       category_id.value = ''
       total_cost.value = ''
       users.value = [users.value[0]]
-      users.value[0].share = 0 // Reset the share to 0
+      users.value[0].share = 0
     } catch (error) {
       console.error(error)
-
-      // Add toast notification for error here
-      const $toast = useToast()
-      $toast.error('Failed to add expense. Please try again.', {
+      toast.error('Failed to add expense. Please try again.', {
         hideProgressBar: true
       })
     }
   } else {
     // Map the errors to the corresponding fields
-    console.log(result.errors)
     errors.value = result.errors.reduce((acc, error) => {
       if (error.field === 'password') {
+        // handle password error
         if (!acc[error.field]) {
           acc[error.field] = []
         }
@@ -400,5 +353,29 @@ async function submitForm() {
       return acc
     }, {})
   }
+}
+
+// Define a method to open the dialog
+const openDialog = () => {
+  isDialogOpen.value = true
+}
+
+// Define a method to handle the dialog close event
+const handleClose = (user) => {
+  if (typeof user === 'object' && user && user.id) {
+    // Check if the user is not null
+    const userExists = users.value.some((existingUser) => existingUser.id === user.id) // Check if the user is not already in the list
+    if (!userExists) {
+      // If not, add the user to the list
+      users.value.push(user)
+    } else {
+      toast.error('User already exists in the list', {
+        hideProgressBar: true
+      })
+    }
+  } else {
+    console.log('No user selected')
+  }
+  isDialogOpen.value = false
 }
 </script>

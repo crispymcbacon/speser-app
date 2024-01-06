@@ -101,7 +101,6 @@ let lastName = ref('')
 let username = ref('')
 let password = ref('')
 let errors = ref({})
-
 const router = useRouter()
 const toast = useToast()
 
@@ -120,18 +119,21 @@ const register = async () => {
 
     if (response.status === 'success') {
       router.push('/signin') // Redirect to signin
-      toast.success('Done! Now you can login', { // Show success toast
+      toast.success('Done! Now you can login', {
+        // Show success toast
         hideProgressBar: true
       })
     } else {
-      toast.error(`${response.message}`, { // Show error toast
+      toast.error(`${response.message}`, {
+        // Show error toast
         hideProgressBar: true
       })
     }
   } else {
-    // Set errors
     errors.value = result.errors.reduce((acc, error) => {
-      if (error.field === 'password') { // Password field can have multiple errors
+      // Set errors
+      if (error.field === 'password') {
+        // Password field can have multiple errors
         if (!acc[error.field]) {
           acc[error.field] = []
         }

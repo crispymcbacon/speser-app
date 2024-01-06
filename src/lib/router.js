@@ -8,8 +8,8 @@ import BalanceToUser from '@/views/BalanceToUser.vue'
 import AddExpense from '@/views/AddExpense.vue'
 import ExpensesView from '@/views/ExpensesView.vue'
 import SearchExpense from '@/views/SearchExpense.vue'
-import ExpenseDetailView from '@/views/ExpenseDetailView.vue'
-import ExpenseEditView from '@/views/ExpenseEditView.vue'
+import ExpenseDetail from '@/views/ExpenseDetail.vue'
+import ExpenseEdit from '@/views/ExpenseEdit.vue'
 import NotFound from '@/views/NotFound.vue'
 import UserInfo from '@/views/UserInfo.vue'
 
@@ -68,13 +68,13 @@ const router = createRouter({
     {
       path: '/expense/:year/:month/:id',
       name: 'expensedetail',
-      component: ExpenseDetailView,
+      component: ExpenseDetail,
       meta: { requiresAuth: true }
     },
     {
       path: '/expenseedit/:year/:month/:id',
       name: 'expenseedit',
-      component: ExpenseEditView,
+      component: ExpenseEdit,
       meta: { requiresAuth: true }
     },
     {

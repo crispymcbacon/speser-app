@@ -109,7 +109,8 @@ const emits = defineEmits(['login', 'logout'])
 // Fetch expenses
 const fetchExpenses = async () => {
   loading.value = true
-  data.value = await getExpenses( // Get expenses
+  data.value = await getExpenses(
+    // Get expenses
     yearToggle.value ? selectedYear.value : undefined, // If yearToggle not toggled, pass undefined
     monthToggle.value ? selectedMonth.value : undefined // If monthToggle not toggled, pass undefined
   )

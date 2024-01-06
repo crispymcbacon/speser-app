@@ -1,21 +1,24 @@
 <template>
-  <!-- Header -->
-  <div class="px-4 grid grid-cols-5 items-center md:px-6">
-    <button @click="goBack">
-      <IconArrowLeft :size="24" stroke-width="2" />
-    </button>
-    <h1 class="text-2xl font-bold col-span-3 text-center">Edit expense</h1>
-    <div></div>
-  </div>
-  <!-- Search input -->
-  <div class="flex mt-4">
-    <div class="max-w-lg w-full mx-auto">
-      <div v-if="loading" class="text-center">
-        <div class="spinner"></div>
+  <div class="mt-2 md:px-2">
+    <!-- Header -->
+    <div class="px-4 grid grid-cols-5 items-center md:px-6">
+      <button @click="goBack">
+        <IconArrowLeft :size="24" stroke-width="2" />
+      </button>
+      <h1 class="text-2xl font-bold col-span-3 text-center">Edit expense</h1>
+      <div></div>
+    </div>
+    <!-- Loading -->
+    <div v-if="loading" class="mx-auto flex justify-center h-[60vh]">
+      <div class="text-lg font-semibold flex flex-row items-center">
+        <IconLoader2 class="animate-spin mr-2" :size="28" stroke-width="2" />
         Loading...
       </div>
-      <div v-else>
-        <form @submit.prevent="submitForm" class="text-center">
+    </div>
+    <!-- Search input -->
+    <div v-else class="flex mt-4">
+      <div class="max-w-lg w-full mx-auto">
+        <form @submit.prevent="submitForm">
           <!-- Total Cost-->
           <div class="mb-2 px-4">
             <label class="form-control w-full">
@@ -35,7 +38,6 @@
                 class="input input-bordered w-full"
               />
             </label>
-
             <div v-if="errors.total_cost" class="text-red-500 text-sm text-right mt-1">
               {{ errors.total_cost }}
             </div>
@@ -129,9 +131,9 @@
                   <th class="w-1/2">Username</th>
                   <th>Share</th>
                   <th>Action</th>
-                  <!-- New column -->
                 </tr>
               </thead>
+              <!-- body -->
               <tbody v-if="users">
                 <tr v-for="(user, index) in users" :key="index">
                   <td class="text-base font-semibold pl-4">&nbsp;@{{ user.username }}</td>
@@ -159,16 +161,20 @@
                 <IconUserPlus :size="24" stroke-width="2" />Add User
               </button>
             </div>
-
             <div v-if="errors.total_cost" class="text-red-500 text-sm text-right mt-1">
               {{ errors.total_cost }}
             </div>
           </div>
+          <!-- Submit Button -->
           <div class="px-4">
-          <button type="submit" class="btn w-full mt-4 items-center py-7 content-center text-base">
-            <IconEdit :size="24" stroke-width="2" />
-            Edit Expense</button>
-        </div>
+            <button
+              type="submit"
+              class="btn w-full mt-4 items-center py-7 content-center text-base"
+            >
+              <IconEdit :size="24" stroke-width="2" />
+              Edit Expense
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -201,10 +207,9 @@ const total_cost = ref('')
 const errors = ref({})
 const users = ref([])
 const shareEqually = ref(true)
-const $toast = useToast()
+const toast = useToast()
 const isRefund = ref(false)
 const isDialogOpen = ref(false)
-
 const route = useRoute()
 const router = useRouter()
 const year = route.params.year
@@ -212,92 +217,42 @@ const month = route.params.month
 const id = route.params.id
 const expense = ref(null)
 const loading = ref(true)
-
-const goBack = () => {
-  router.back()
-}
-
-// Track refund
-watch(isRefund, (newVal) => {
-  if (newVal) {
-    total_cost.value = 0
-    category_id.value = 1
-    shareEqually.value = false
-  }
-})
-
-// Get categories from API
-let categories = []
-getCategories().then((response) => {
-  categories = response
-})
-
-// Define dialog state and content
-
-// Define dialog actions
-
-// Define a method to open the dialog
-const openDialog = () => {
-  isDialogOpen.value = true
-}
-
-// Watch for changes in users array, isRefund, and shareEqually
-watch(
-  [users, total_cost, isRefund, shareEqually],
-  ([newUsers, newTotalCost, newIsRefund, newShareEqually]) => {
-    if (newIsRefund) {
-      if (!newShareEqually && newUsers.length > 1) {
-        // 1 because the disabled user is always present
-        // Calculate the sum of shares for all users other than the disabled one
-        let sumOfOtherShares = 0
-        for (let i = 1; i < newUsers.length; i++) {
-          sumOfOtherShares += parseFloat(newUsers[i].share || 0)
-        }
-        console.log(sumOfOtherShares)
-        // Update the share for the disabled user (expected to be at index 0)
-        newUsers[0].share = (-sumOfOtherShares).toFixed(2)
-      }
-    } else {
-      if (newShareEqually && newTotalCost && newUsers.length > 0) {
-        const equalShare = (parseFloat(newTotalCost) / newUsers.length).toFixed(2)
-        newUsers.forEach((user) => (user.share = equalShare))
-      }
-    }
-  },
-  { deep: true }
-)
+const categories = ref([])
 
 // When the component is mounted, get the user_id from the store
 onMounted(async () => {
   const userStore = useUserStore()
-  user_id.value = userStore.user_id
+  user_id.value = userStore.user_id // Get user_id from store
 
   try {
-    expense.value = await getExpense(year, month, id)
-    if (expense.value && expense.value.length > 0) {
-      expense.value = expense.value[0]
+    categories.value = await getCategories() // Get categories
+    categories.value.shift() // Remove the first category (id = 1) from the list, as it is the Refund category
 
-      // Check if the expense is of the logged user
+    expense.value = await getExpense(year, month, id) // Get expense
+
+    if (expense.value && expense.value.length > 0) {
+      // If expense found
+      expense.value = expense.value[0] // Get the first element of the array
+
       if (parseInt(expense.value.user_id) !== parseInt(user_id.value)) {
-        // Redirect to the notfound page
+        // Check if the expense is of the logged user
         router.push({ name: 'notfound' })
       }
 
+      // Convert the date
       const newdate = new Date(expense.value.date)
       date.value = new Date(Date.UTC(newdate.getFullYear(), newdate.getMonth(), newdate.getDate()))
         .toISOString()
         .split('T')[0]
 
       // Fill the input values with the fetched expense data
-      //date.value = expense.value.date.split('T')[0] // Assuming the date is in ISO format
       description.value = expense.value.description
       category_id.value = expense.value.category_id
       total_cost.value = expense.value.total_cost
       isRefund.value = total_cost.value === 0 ? true : false
       shareEqually.value = false
 
-      // Populate users with whatever data structure you receive, e.g., expense.value.users
-      // You might need to transform this data to match the structure expected by your `users` array
+      // Populate users
       users.value = expense.value.users.map((user) => ({
         id: user.id,
         username: user.username,
@@ -305,16 +260,14 @@ onMounted(async () => {
         isDefault: parseInt(user.id) === parseInt(userStore.user_id)
       }))
     }
-    // Check if the user is not already in the list
+
     const userExists = users.value.some(
+      // Check if the user is not already in the list
       (existingUser) => parseInt(existingUser.id) === parseInt(user_id.value)
     )
-
-    // maybe not needed
     if (!userExists) {
-      // Add current user to the list
+      // If not, add the user to the list
       users.value.push({ id: user_id.value, username: userStore.username, isDefault: true })
-      console.log(users.value)
     }
   } catch (error) {
     console.error(error)
@@ -323,69 +276,86 @@ onMounted(async () => {
   }
 })
 
-const handleClose = (user) => {
-  if (typeof user === 'object' && user && user.id) {
-    const userExists = users.value.some((existingUser) => existingUser.id === user.id)
+// Track refund checkbox
+watch(isRefund, (newVal) => {
+  if (newVal) {
+    // If is a refund
+    total_cost.value = 0
+    category_id.value = 1 // Set category to Refund
+    shareEqually.value = false
+  }
+})
 
-    if (!userExists) {
-      // Add share property to the user
-      //user.share = userShare.value
-      users.value.push(user)
+// Track shareEqually checkbox
+watch(
+  [users, total_cost, isRefund, shareEqually],
+  ([newUsers, newTotalCost, newIsRefund, newShareEqually]) => {
+    if (newIsRefund) {
+      // If is a refund, calculate the shares
+      if (!newShareEqually && newUsers.length > 1) {
+        // 1 because the logged user is always present
+        // Calculate the sum of shares for all users other than the logged one
+        let sumOfOtherShares = 0
+        for (let i = 1; i < newUsers.length; i++) {
+          sumOfOtherShares += parseFloat(newUsers[i].share || 0)
+        }
+        // Update the share for the logged user (expected to be the first one)
+        newUsers[0].share = (-sumOfOtherShares).toFixed(2) // Negative because it is a refund
+      }
+
+      // Force Refund to categories with category_id = 1
+      const refundCategory = {
+        category_id: 1,
+        category_name: 'Refund'
+      }
+      categories.value.unshift(refundCategory)
     } else {
-      console.log('User already exists in the list')
-      $toast.error('User already exists in the list', {
-        hideProgressBar: true
-      })
+      // If is not a refund, calculate the equal share
+      if (newShareEqually && newTotalCost && newUsers.length > 0) {
+        // 0 because the logged user is always present
+        const equalShare = (parseFloat(newTotalCost) / newUsers.length).toFixed(2) // Calculate the equal share
+        newUsers.forEach((user) => (user.share = equalShare)) // Update the share for all users
+      }
+      // Remove the category Refund from categories
+      categories.value.shift()
     }
-  } else {
-    console.log('No user selected')
-  }
-  isDialogOpen.value = false
-}
+  },
+  { deep: true } // Watch nested properties of objects (users)
+)
 
+// Define a method to delete a user from the list
 const deleteUser = (index) => {
-  if (users.value[index].isDefault) {
-    console.log('Default user cannot be deleted')
-    return
-  }
   users.value.splice(index, 1)
 }
 
+// Edit the expense
 async function submitForm() {
-  console.log(total_cost.value)
   const result = await validateExpenseInput(
+    // Validate the input
     date.value,
     category_id.value,
     total_cost.value,
     description.value
   )
   if (result.status === 'validated') {
-    // Calculate the sum of all user shares
-    const sumOfShares = users.value.reduce((sum, user) => sum + parseFloat(user.share), 0)
+    const sumOfShares = users.value.reduce((sum, user) => sum + parseFloat(user.share), 0) // Calculate the sum of all user shares
 
-    // Define an acceptable error margin
-    const epsilon = 0.01
-
-    // Compare the sum of shares with the total cost
+    const epsilon = 0.01 // Define an acceptable error margin (es. case 3.333)
     if (Math.abs(sumOfShares - parseFloat(total_cost.value)) > epsilon) {
-      // Set an error message and return from the function
-      $toast.error('The sum of shares does not equal the total cost.', {
+      // Compare the sum of shares with the total cost
+      toast.error('The sum of shares does not equal the total cost.', {
         hideProgressBar: true
       })
       return
     }
 
-    // Get user_id from store
-    const userStore = useUserStore()
-    user_id.value = parseInt(userStore.user_id)
-
     const expense = {
+      // Create the expense object
       user_id: user_id.value,
       date: date.value,
       description: description.value,
       category_id: category_id.value,
       total_cost: total_cost.value,
-      // Include the shares of each user
       users: users.value.map((user) => ({ user_id: user.id, share: user.share })),
       expense_id: parseInt(id)
     }
@@ -394,7 +364,9 @@ async function submitForm() {
       const dateObject = new Date(date.value)
       const year = dateObject.getFullYear()
       const month = dateObject.getMonth() + 1 // JavaScript months are 0-indexed
-      const response = await updateExpense(
+
+      await updateExpense(
+        // Update the expense
         year,
         month,
         expense.expense_id,
@@ -405,11 +377,8 @@ async function submitForm() {
         expense.users,
         date.value
       )
-      console.log(response)
 
-      // Add toast notification here
-      const $toast = useToast()
-      $toast.success('Expense edited successfully!', {
+      toast.success('Expense added successfully!', {
         hideProgressBar: true
       })
 
@@ -419,16 +388,13 @@ async function submitForm() {
       category_id.value = ''
       total_cost.value = ''
       users.value = [users.value[0]]
-      users.value[0].share = 0 // Reset the share to 0
+      users.value[0].share = 0
 
       // Redirect to the expense detail page, passing the year, month, and id as params
       router.push({ name: 'expensedetail', params: { year, month, id: expense.expense_id } })
     } catch (error) {
       console.error(error)
-
-      // Add toast notification for error here
-      const $toast = useToast()
-      $toast.error('Failed to edit expense. Please try again.', {
+      toast.error('Failed to edit expense. Please try again.', {
         hideProgressBar: true
       })
     }
@@ -437,6 +403,7 @@ async function submitForm() {
     console.log(result.errors)
     errors.value = result.errors.reduce((acc, error) => {
       if (error.field === 'password') {
+        // handle password error
         if (!acc[error.field]) {
           acc[error.field] = []
         }
@@ -447,5 +414,36 @@ async function submitForm() {
       return acc
     }, {})
   }
+}
+
+// Go back
+const goBack = () => {
+  router.back()
+}
+
+// Define a method to open the dialog
+const openDialog = () => {
+  isDialogOpen.value = true
+}
+
+// Define a method to handle the dialog close
+const handleClose = (user) => {
+  if (typeof user === 'object' && user && user.id) {
+    const userExists = users.value.some((existingUser) => existingUser.id === user.id)
+
+    if (!userExists) {
+      // Add share property to the user
+      //user.share = userShare.value
+      users.value.push(user)
+    } else {
+      console.log('User already exists in the list')
+      toast.error('User already exists in the list', {
+        hideProgressBar: true
+      })
+    }
+  } else {
+    console.log('No user selected')
+  }
+  isDialogOpen.value = false
 }
 </script>
