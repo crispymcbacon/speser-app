@@ -1,21 +1,26 @@
 <template>
-  <div class="px-4 mx-2">
-    <div v-if="loading" class="text-center">
-      <div class="spinner"></div>
-      Loading...
+  <div class="mt-2 md:px-2">
+    <!-- Loading -->
+    <div v-if="loading" class="mx-auto flex justify-center h-[60vh]">
+      <div class="text-lg font-semibold flex flex-row items-center">
+        <IconLoader2 class="animate-spin mr-2" :size="28" stroke-width="2" />
+        Loading...
+      </div>
     </div>
+    <!-- Content-->
     <div v-else>
-      <div class="flex justify-between items-center mt-4">
+      <!-- Header -->
+      <div class="px-4 grid grid-cols-5 items-center md:px-6">
         <button @click="goBack" class="">
           <IconArrowLeft :size="24" stroke-width="2" />
         </button>
-        <div class="text-xl font-bold text-center">ID #{{ expense.id }}</div>
-        <button @click="editExpense" class="" v-if="isEditable">
+        <div class="text-xl font-bold text-center col-span-3">ID #{{ expense.id }}</div>
+        <button @click="editExpense" class="items-end justify-end flex" v-if="isEditable">
           <IconEdit :size="24" stroke-width="2" />
         </button>
-        <div v-if="!isEditable"></div>
+        <div v-else></div>
       </div>
-      <!-- -->
+      <!-- Expense -->
       <div class="px-2 max-w-lg mx-auto">
         <div class="flex flex-row items-center text-gray-500 py-1 mt-8">
           <IconCalendar :size="20" stroke-width="2" class="mr-2" />
@@ -77,7 +82,8 @@ import {
   IconCalendar,
   IconReceipt,
   IconCategory,
-  IconUser
+  IconUser,
+  IconLoader2
 } from '@tabler/icons-vue'
 
 const route = useRoute()

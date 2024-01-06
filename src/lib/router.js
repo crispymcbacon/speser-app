@@ -4,13 +4,13 @@ import HomeView from '@/views/HomeView.vue'
 import SigninView from '@/views/SigninView.vue'
 import SignupView from '@/views/SignupView.vue'
 import BalanceView from '@/views/BalanceView.vue'
-import BalanceToUserView from '@/views/BalanceToUserView.vue'
+import BalanceToUser from '@/views/BalanceToUser.vue'
 import AddExpense from '@/views/AddExpense.vue'
 import ExpensesView from '@/views/ExpensesView.vue'
-import SearchExpenseView from '@/views/SearchExpenseView.vue'
+import SearchExpense from '@/views/SearchExpense.vue'
 import ExpenseDetailView from '@/views/ExpenseDetailView.vue'
 import ExpenseEditView from '@/views/ExpenseEditView.vue'
-import NotFoundView from '@/views/NotFoundView.vue'
+import NotFound from '@/views/NotFound.vue'
 import UserInfo from '@/views/UserInfo.vue'
 
 // Create the router for navigation
@@ -44,7 +44,7 @@ const router = createRouter({
     {
       path: '/balancetouser',
       name: 'balancetouser',
-      component: BalanceToUserView,
+      component: BalanceToUser,
       meta: { requiresAuth: true }
     },
     {
@@ -62,7 +62,7 @@ const router = createRouter({
     {
       path: '/searchexpense',
       name: 'searchexpense',
-      component: SearchExpenseView,
+      component: SearchExpense,
       meta: { requiresAuth: true }
     },
     {
@@ -86,7 +86,7 @@ const router = createRouter({
     {
       path: '/:pathMatch(.*)*',
       name: 'notfound',
-      component: NotFoundView,
+      component: NotFound,
     },
   ]
 })

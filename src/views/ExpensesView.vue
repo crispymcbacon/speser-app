@@ -12,6 +12,7 @@
     <!-- Filters -->
     <div class="mt-4">
       <div class="flex flex-row space-x-4">
+        <!-- Filer Year-->
         <div class="form-control grow">
           <label for="yearToggle" class="label cursor-pointer">
             <span class="label-text">Filter by Year</span>
@@ -21,6 +22,7 @@
             <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
           </select>
         </div>
+        <!-- Filer Month-->
         <div class="form-control grow">
           <label for="monthToggle" class="label cursor-pointer">
             <span class="label-text">Filter by Month</span>
@@ -33,8 +35,14 @@
       </div>
     </div>
   </div>
+  <!-- Loading -->
+  <div v-if="loading" class="mx-auto flex justify-center h-[60vh]">
+    <div class="text-lg font-semibold flex flex-row items-center">
+      <IconLoader2 class="animate-spin mr-2" :size="28" stroke-width="2" />
+      Loading...
+    </div>
+  </div>
   <!-- Expenses -->
-  <div v-if="loading">Loading...</div>
   <div v-else>
     <div class="overflow-x-auto mt-4">
       <table class="table table-zebra">
@@ -48,6 +56,7 @@
             <th>Total Cost</th>
           </tr>
         </thead>
+        <!-- body -->
         <tbody class="cursor-pointer">
           <tr v-for="(expense, index) in data" :key="index" @click="goToDetail(expense)">
             <th>{{ index + 1 }}</th>
@@ -65,8 +74,12 @@
             <td class="hidden sm:table-cell">
               {{ new Date(expense.date).toLocaleDateString() }}
             </td>
-            <td :class="{'text-gray-500': parseInt(expense.total_cost) === 0}" class="font-semibold">€{{ expense.total_cost }}</td>
-            <!-- <td :class="balanceColor(expense.balance)">{{ expense.balance }}</td> -->
+            <td
+              :class="{ 'text-gray-500': parseInt(expense.total_cost) === 0 }"
+              class="font-semibold"
+            >
+              €{{ expense.total_cost }}
+            </td>
           </tr>
         </tbody>
       </table>
@@ -76,9 +89,9 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { getExpenses } from '../lib/api.js'
+import { getExpenses } from '@/lib/api.js'
 import { useRouter } from 'vue-router'
-import { IconSearch } from '@tabler/icons-vue'
+import { IconSearch, IconLoader2 } from '@tabler/icons-vue'
 
 const loading = ref(true)
 const data = ref(null)
@@ -86,39 +99,31 @@ const selectedYear = ref(new Date().getFullYear())
 const selectedMonth = ref(new Date().getMonth() + 1) // Months are 0-indexed
 const yearToggle = ref(false)
 const monthToggle = ref(false)
-
-const years = ref(Array.from({ length: 5 }, (_, i) => selectedYear.value - i)) // Last 5 years
-const months = ref(Array.from({ length: 12 }, (_, i) => i + 1)) // 12 months
-
+const years = ref(Array.from({ length: 5 }, (_, i) => selectedYear.value - i)) // Calculate last 5 years
+const months = ref(Array.from({ length: 12 }, (_, i) => i + 1)) // Calculate 12 months
 const router = useRouter()
 
 // eslint-disable-next-line no-unused-vars
 const emits = defineEmits(['login', 'logout'])
 
+// Fetch expenses
 const fetchExpenses = async () => {
   loading.value = true
-  data.value = await getExpenses(
-    yearToggle.value ? selectedYear.value : undefined,
-    monthToggle.value ? selectedMonth.value : undefined
+  data.value = await getExpenses( // Get expenses
+    yearToggle.value ? selectedYear.value : undefined, // If yearToggle not toggled, pass undefined
+    monthToggle.value ? selectedMonth.value : undefined // If monthToggle not toggled, pass undefined
   )
   loading.value = false
-  console.log(data.value)
 }
 
-onMounted(fetchExpenses)
+onMounted(async () => {
+  await fetchExpenses()
+})
 
+// If yearToggle or monthToggle changes, fetch expenses
 watch([selectedYear, selectedMonth, yearToggle, monthToggle], fetchExpenses)
 
-const balanceColor = (balance) => {
-  if (balance.includes('Debit')) {
-    return 'text-red-500'
-  } else if (balance.includes('Credit')) {
-    return 'text-green-500'
-  } else {
-    return 'text-gray-500'
-  }
-}
-
+// Go to expense detail
 const goToDetail = (expense) => {
   const year = new Date(expense.date).getFullYear()
   const month = new Date(expense.date).getMonth() + 1

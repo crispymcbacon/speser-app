@@ -1,22 +1,3 @@
-<script setup>
-import { useUserStore } from '../lib/stores.js'
-import { ref, onMounted } from 'vue'
-import { getBalance } from '../lib/api.js'
-const userStore = useUserStore()
-
-const loading = ref(true)
-const data = ref(null)
-
-// eslint-disable-next-line no-unused-vars
-const emits = defineEmits(['login', 'logout'])
-
-onMounted(async () => {
-  const balanceData = await getBalance()
-  data.value = balanceData
-  loading.value = false
-})
-</script>
-
 <template>
   <div class="px-4 mt-2 md:px-6">
     <!-- Header -->
@@ -24,12 +5,19 @@ onMounted(async () => {
       <h1 class="text-4xl font-bold mb-2 lg:text-5xl">Home</h1>
     </div>
   </div>
-  <div class="hero-content text-center">
+  <!-- Loading -->
+  <div v-if="loading" class="mx-auto flex justify-center h-[60vh]">
+      <div class="text-lg font-semibold flex flex-row items-center">
+        <IconLoader2 class="animate-spin mr-2" :size="28" stroke-width="2" />
+        Loading...
+      </div>
+    </div>
+    <!-- Content -->
+  <div v-else class="hero-content text-center">
     <div class="max-w-lg">
       <h1 class="text-2xl font-bold mt-2 lg:text-3xl">Welcome back, {{ userStore.first_name }}!</h1>
       <div>
-        <div v-if="loading">Loading...</div>
-        <div v-else class="px-4 mt-4">
+        <div  class="px-4 mt-4">
           <div class="flex flex-row">
             <div class="stat text-center">
               <div class="stat-title">You own</div>
@@ -50,3 +38,22 @@ onMounted(async () => {
     </div>
   </div>
 </template>
+
+<script setup>
+import { useUserStore } from '@/lib/stores.js'
+import { ref, onMounted } from 'vue'
+import { getBalance } from '@/lib/api.js'
+import { IconLoader2 } from '@tabler/icons-vue'
+
+const userStore = useUserStore() // Get user info from store
+const loading = ref(true)
+const data = ref(null)
+
+// eslint-disable-next-line no-unused-vars
+const emits = defineEmits(['login', 'logout'])
+
+onMounted(async () => {
+  data.value = await getBalance() // Get balance data
+  loading.value = false
+})
+</script>
