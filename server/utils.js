@@ -2,9 +2,8 @@ import jwt from 'jsonwebtoken';
 
 // Authentication using JWT
 export function authenticateToken(req, res, next) {
-    // Gather the jwt access token from the request header
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const token = authHeader && authHeader.split(' ')[1]; // Get the jwt access token from the request header
   
     // If no token found, return an error response
     if (!token) {
@@ -17,7 +16,6 @@ export function authenticateToken(req, res, next) {
       req.user_id = decoded.user_id;
       next();
     } catch (err) {
-      // If token is invalid, return an error response
       return res.status(403).json({ error: 'Invalid access token' });
     }
   }

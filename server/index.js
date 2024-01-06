@@ -1,7 +1,6 @@
 import path from 'path';
 import express from 'express';
 import router from './routes.js';
-import * as db from './db.js'
 import cors from 'cors'; // IMPORTANT: DELETE THIS IN PRODUCTION
 
 const __dirname = new URL(path.join(import.meta.url, '..')).pathname; // current directory

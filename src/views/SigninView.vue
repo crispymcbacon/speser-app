@@ -50,8 +50,8 @@ import { useToast } from 'vue-toastification'
 
 const emit = defineEmits(['login'])
 
-let username = ref('')
-let password = ref('')
+const username = ref('')
+const password = ref('')
 const router = useRouter()
 const toast = useToast()
 

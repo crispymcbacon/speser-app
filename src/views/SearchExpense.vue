@@ -90,7 +90,7 @@ import { useRouter } from 'vue-router'
 import { IconArrowLeft, IconSearch, IconLoader2 } from '@tabler/icons-vue'
 
 const loading = ref(false)
-let data = ref(null)
+const data = ref(null)
 const searchQuery = ref('')
 const router = useRouter()
 

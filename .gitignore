@@ -3,7 +3,7 @@
 .vscode
 .env
 *.md
-/db
+/db/password.txt
 *.rest
 
 hashpassword.js

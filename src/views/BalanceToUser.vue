@@ -98,12 +98,12 @@ import { useToast } from 'vue-toastification'
 import { useRouter } from 'vue-router'
 import { IconArrowLeft } from '@tabler/icons-vue'
 
-let data = ref(null)
+const data = ref(null)
 const logged_username = ref('')
 const username = ref('')
 const searchQuery = ref('')
 const toast = useToast()
-let searchResults = ref([]) // new ref for search results
+const searchResults = ref([]) // new ref for search results
 const router = useRouter()
 
 onMounted(() => {

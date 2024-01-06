@@ -11,5 +11,5 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 'latest'
   },
-  //"node": true
+  "node": true // comment this line out if you're not using Node.js
 }

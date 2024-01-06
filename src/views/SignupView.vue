@@ -96,11 +96,11 @@ import { validateRegistrationInput } from '@/lib/utils.js'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 
-let firstName = ref('')
-let lastName = ref('')
-let username = ref('')
-let password = ref('')
-let errors = ref({})
+const firstName = ref('')
+const lastName = ref('')
+const username = ref('')
+const password = ref('')
+const errors = ref({})
 const router = useRouter()
 const toast = useToast()
 
