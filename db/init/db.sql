@@ -32,7 +32,7 @@ CREATE TABLE expense_shares (
     id SERIAL PRIMARY KEY,
     expense_id INTEGER REFERENCES expenses(id) ON DELETE CASCADE,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    share DECIMAL(10, 2) NOT NULL -- CHECK (share >= 0),
+    share DECIMAL(10, 2) NOT NULL, -- CHECK (share >= 0)
     UNIQUE(expense_id, user_id) -- Ensure each user has only one share per expense
 );
 
@@ -44,3 +44,16 @@ CREATE INDEX idx_expense_shares_expense_id ON expense_shares(expense_id);
 CREATE INDEX idx_expense_shares_user_id ON expense_shares(user_id);
 CREATE INDEX idx_users_username ON users(username);
 CREATE INDEX idx_categories_name ON categories(name);
+
+INSERT INTO users (username, first_name, last_name, password_hash) VALUES 
+('user', 'John', 'Doe', '$2a$10$oCkHYiUl3JU6IDfilaYbz.hLwufvLA0YNL/IK6IpTqYgKIhfn0AKC'),
+('mario', 'Mario', 'Rossi', '$2a$10$oCkHYiUl3JU6IDfilaYbz.hLwufvLA0YNL/IK6IpTqYgKIhfn0AKC');
+
+-- Insert into categories
+INSERT INTO categories (id, name, created_at)
+VALUES (1, 'Refund', CURRENT_TIMESTAMP);
+
+INSERT INTO categories (id, name, created_at) VALUES 
+(2, 'Groceries', CURRENT_TIMESTAMP),
+(3, 'Rent', CURRENT_TIMESTAMP),
+(4, 'Utilities', CURRENT_TIMESTAMP);

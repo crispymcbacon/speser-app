@@ -96,6 +96,9 @@ router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const currentUser = VueCookies.get('jwt'); 
 
+  console.log('requiresAuth', requiresAuth);
+  console.log('currentUser', currentUser);
+
   if (requiresAuth && (!currentUser || currentUser === 'undefined')) {
     next('/signin');
   } else if (!requiresAuth && currentUser) {

@@ -4,6 +4,7 @@
 .env
 *.md
 /db/password.txt
+/db/data
 *.rest
 
 hashpassword.js
