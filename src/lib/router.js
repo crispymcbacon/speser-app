@@ -1,18 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import VueCookies from 'vue-cookies';
-import HomeView from '../views/HomeView.vue'
-import SigninView from '../views/SigninView.vue'
-import SignupView from '../views/SignupView.vue'
-import BalanceView from '../views/BalanceView.vue'
-import BalanceToUserView from '../views/BalanceToUserView.vue'
-import AddExpenseView from '../views/AddExpenseView.vue'
-import ExpensesView from '../views/ExpensesView.vue'
-import SearchExpenseView from '../views/SearchExpenseView.vue'
-import ExpenseDetailView from '../views/ExpenseDetailView.vue'
-import ExpenseEditView from '../views/ExpenseEditView.vue'
-import NotFoundView from '../views/NotFoundView.vue'
-import UserInfoView from '../views/UserInfoView.vue'
+import HomeView from '@/views/HomeView.vue'
+import SigninView from '@/views/SigninView.vue'
+import SignupView from '@/views/SignupView.vue'
+import BalanceView from '@/views/BalanceView.vue'
+import BalanceToUserView from '@/views/BalanceToUserView.vue'
+import AddExpense from '@/views/AddExpense.vue'
+import ExpensesView from '@/views/ExpensesView.vue'
+import SearchExpenseView from '@/views/SearchExpenseView.vue'
+import ExpenseDetailView from '@/views/ExpenseDetailView.vue'
+import ExpenseEditView from '@/views/ExpenseEditView.vue'
+import NotFoundView from '@/views/NotFoundView.vue'
+import UserInfo from '@/views/UserInfo.vue'
 
+// Create the router for navigation
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -49,7 +50,7 @@ const router = createRouter({
     {
       path: '/addexpense',
       name: 'addexpense',
-      component: AddExpenseView,
+      component: AddExpense,
       meta: { requiresAuth: true }
     },
     {
@@ -79,7 +80,7 @@ const router = createRouter({
     {
       path: '/userinfo',
       name: 'userinfo',
-      component: UserInfoView,
+      component: UserInfo,
       meta: { requiresAuth: true }
     },
     {
@@ -93,14 +94,13 @@ const router = createRouter({
 // Check if the route requires authentication
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-  const currentUser = VueCookies.get('jwt'); // replace 'jwt-token' with your actual token name
+  const currentUser = VueCookies.get('jwt'); 
 
-  if (requiresAuth && !currentUser) {
+  if (requiresAuth && (!currentUser || currentUser === 'undefined')) {
     next('/signin');
   } else if (!requiresAuth && currentUser) {
-    next();
+    next('/');
   } else {
-    //next('/notfound');
     next();
   }
 });

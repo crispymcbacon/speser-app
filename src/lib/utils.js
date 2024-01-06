@@ -1,4 +1,3 @@
-// TODO existing username check
 export async function validateRegistrationInput(username, firstName, lastName, password) {
   const errors = []
 
@@ -26,11 +25,14 @@ export async function validateRegistrationInput(username, firstName, lastName, p
     })
   }
 
-  const usernameRegex = /^[a-zA-Z0-9_]+$/
+  // Only allow lowercase alphanumeric characters and underscores in the username
+  const usernameRegex = /^[a-z0-9_]+$/
+  console.log(username)
+  console.log(usernameRegex.test(username))
   if (!usernameRegex.test(username)) {
     errors.push({
       status: 'error',
-      message: 'Username can only contain alphanumeric characters and underscores',
+      message: 'Username can only contain lowercase alphanumeric characters and underscores',
       field: 'username'
     })
   }
@@ -78,30 +80,31 @@ export async function validateRegistrationInput(username, firstName, lastName, p
 }
 
 export async function validateExpenseInput(date, category_id, total_cost, description) {
-    const errors = []
-  
-    if (!date) {
-      errors.push({ status: 'error', message: 'Date is required', field: 'date' })
-    } else {
-      const inputDate = new Date(date);
-      const currentDate = new Date();
-      if (inputDate > currentDate) {
-        errors.push({ status: 'error', message: 'Date cannot be in the future', field: 'date' })
-      }
-    }
-    if (!category_id) {
-      errors.push({ status: 'error', message: 'Category ID is required', field: 'category_id' })
-    }
-    if (total_cost === undefined || total_cost === null) { // because total_cost can be 0
-      errors.push({ status: 'error', message: 'Total Cost is required', field: 'total_cost' })
-    }
-    if (!description) {
-      errors.push({ status: 'error', message: 'Description is required', field: 'description' })
-    }
-  
-    return {
-      status: errors.length > 0 ? 'error' : 'validated',
-      message: 'All fields are validated',
-      errors
+  const errors = []
+
+  if (!date) {
+    errors.push({ status: 'error', message: 'Date is required', field: 'date' })
+  } else {
+    const inputDate = new Date(date)
+    const currentDate = new Date()
+    if (inputDate > currentDate) {
+      errors.push({ status: 'error', message: 'Date cannot be in the future', field: 'date' })
     }
   }
+  if (!category_id) {
+    errors.push({ status: 'error', message: 'Category ID is required', field: 'category_id' })
+  }
+  if (total_cost === undefined || total_cost === null) {
+    // because total_cost can be 0
+    errors.push({ status: 'error', message: 'Total Cost is required', field: 'total_cost' })
+  }
+  if (!description) {
+    errors.push({ status: 'error', message: 'Description is required', field: 'description' })
+  }
+
+  return {
+    status: errors.length > 0 ? 'error' : 'validated',
+    message: 'All fields are validated',
+    errors
+  }
+}

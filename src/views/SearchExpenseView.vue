@@ -70,20 +70,31 @@ const goToDetail = (expense) => {
               <tr>
                 <th></th>
                 <th>Description</th>
+                <th class="hidden sm:table-cell">Category</th>
                 <th class="hidden sm:table-cell">Date</th>
                 <th>Total Cost</th>
                 <!-- <th>Balance</th> -->
               </tr>
             </thead>
-            <tbody>
+            <tbody class="cursor-pointer">
               <!-- dynamic rows -->
               <tr v-for="(expense, index) in data" :key="index" @click="goToDetail(expense)">
                 <th>{{ index + 1 }}</th>
+                <th class="hidden sm:table-cell">
+              <div
+                :class="{
+                  'badge badge-neutral w-24': expense.category_id === 1,
+                  'badge badge-primary w-24 text-base-200': expense.category_id !== 1
+                }"
+              >
+                {{ expense.category_name }}
+              </div>
+            </th>
                 <td>{{ expense.description }}</td>
                 <td class="hidden sm:table-cell">
                   {{ new Date(expense.date).toLocaleDateString() }}
                 </td>
-                <td>{{ expense.total_cost }}</td>
+                <td class="font-semibold" :class="{'text-gray-500': parseInt(expense.total_cost) === 0}">€{{ expense.total_cost }}</td>
                 <!-- <td :class="balanceColor(expense.balance)">{{ expense.balance }}</td> -->
               </tr>
             </tbody>

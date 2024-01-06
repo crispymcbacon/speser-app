@@ -13,6 +13,7 @@
         <button @click="editExpense" class="" v-if="isEditable">
           <IconEdit :size="24" stroke-width="2" />
         </button>
+        <div v-if="!isEditable"></div>
       </div>
       <!-- -->
       <div class="px-2 max-w-lg mx-auto">
@@ -24,7 +25,7 @@
           <IconReceipt :size="20" stroke-width="2" class="mr-2" />
           <div class="text-lg font-bold">{{ expense.description }}</div>
         </div>
-        <div class="flex flex-row items-center py-1 text-gray-500">
+        <div class="flex flex-row items-center py-1">
           <IconCategory :size="20" stroke-width="2" class="mr-2" />
           <div
             :class="{
@@ -34,6 +35,10 @@
           >
             {{ expense.category_name }}
           </div>
+        </div>
+        <div class="flex flex-row items-center py-1 font-semibold">
+          <IconUser :size="20" stroke-width="2" class="mr-2" />
+          @{{ expense.owner_username }}
         </div>
         <!-- Total Cost -->
         <div class="mt-4">
@@ -61,13 +66,19 @@
   </div>
 </template>
 
-
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getExpense } from '../lib/api'
 import { useUserStore } from '../lib/stores.js'
-import { IconArrowLeft, IconEdit, IconCalendar, IconReceipt, IconCategory } from '@tabler/icons-vue'
+import {
+  IconArrowLeft,
+  IconEdit,
+  IconCalendar,
+  IconReceipt,
+  IconCategory,
+  IconUser
+} from '@tabler/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -123,5 +134,3 @@ const editExpense = () => {
   router.push({ name: 'expenseedit', params: { year, month, id } })
 }
 </script>
-
-

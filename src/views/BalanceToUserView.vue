@@ -147,7 +147,7 @@ const goToDetail = (expense) => {
                 <th>Balance</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="cursor-pointer">
               <!-- dynamic rows -->
               <tr
                 v-for="(expense, index) in data.expenses"
@@ -159,7 +159,7 @@ const goToDetail = (expense) => {
                 <td class="hidden sm:table-cell">
                   {{ new Date(expense.date).toLocaleDateString() }}
                 </td>
-                <td>{{ expense.total_cost }}</td>
+                <td class="font-semibold" :class="{'text-gray-500': parseInt(expense.total_cost) === 0}">€{{ expense.total_cost }}</td>
                 <td :class="balanceColor(expense.balance)">{{ expense.balance }}</td>
               </tr>
             </tbody>

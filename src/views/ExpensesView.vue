@@ -2,7 +2,7 @@
   <div class="px-4 mt-2 md:px-6">
     <!-- Header -->
     <div class="flex flex-row justify-between">
-      <h1 class="text-4xl font-bold mb-2 lg:text-5xl">Expenses</h1>
+      <h1 class="text-4xl font-bold mb-2 lg:text-5xl">Your Expenses</h1>
       <button class="px-2">
         <RouterLink active-class="active" to="/searchexpense">
           <IconSearch :size="28" stroke-width="3" />
@@ -48,7 +48,7 @@
             <th>Total Cost</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="cursor-pointer">
           <tr v-for="(expense, index) in data" :key="index" @click="goToDetail(expense)">
             <th>{{ index + 1 }}</th>
             <th class="hidden sm:table-cell">
@@ -65,7 +65,7 @@
             <td class="hidden sm:table-cell">
               {{ new Date(expense.date).toLocaleDateString() }}
             </td>
-            <td :class="{ 'text-gray-400': expense.category_id === 1 }">{{ expense.total_cost }}</td>
+            <td :class="{'text-gray-500': parseInt(expense.total_cost) === 0}" class="font-semibold">€{{ expense.total_cost }}</td>
             <!-- <td :class="balanceColor(expense.balance)">{{ expense.balance }}</td> -->
           </tr>
         </tbody>

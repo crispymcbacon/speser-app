@@ -89,17 +89,13 @@ export async function signup(username, first_name, last_name, password) {
         });
 
         if (!response.ok) {
-            throw new Error('Login failed');
+            const res = await response.json();
+            throw new Error(res.errors[0].msg);
         }
 
-        const data = await response.json();
-
-        // Save the JWT token to a cookie
-        VueCookies.set('jwt', data.accessToken);
-
-        console.log('Success:', data); // DELETE ME
+        return { status: 'success', message: 'Signup successful' };
     } catch (error) {
-        console.error('Error:', error);
+        return { status: 'error', message: error };
     }
 }
 

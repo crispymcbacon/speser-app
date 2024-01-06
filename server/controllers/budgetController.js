@@ -9,10 +9,10 @@ export function validateRegistration() {
     check('username')
       .isLength({ min: 3, max: 15 })
       .withMessage('Username must be between 3 and 15 characters')
-      .matches(/^[a-zA-Z0-9_]+$/)
-      .withMessage('Username can only contain alphanumeric characters and underscores')
+      .matches(/^[a-z0-9_]+$/)
+      .withMessage('Username can only contain lowercase alphanumeric characters and underscores')
       .custom(async (username) => {
-        const existingUser = await db.query('SELECT * FROM users WHERE username = $1', [username])
+        const existingUser = await db.query('SELECT * FROM users WHERE LOWER(username) = LOWER($1)', [username])
         if (existingUser.rows.length > 0) {
           throw new Error('Username already in use')
         }
@@ -33,6 +33,7 @@ export function validateRegistration() {
 
     (req, res, next) => {
       const errors = validationResult(req)
+      console.log(errors)
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() })
       }
@@ -49,12 +50,12 @@ export const registerUser = async (req, res) => {
 
   try {
     // Insert the user into the database
-    const result = await db.query(
+    await db.query(
       'INSERT INTO users (username, first_name, last_name, password_hash) VALUES ($1, $2, $3, $4) RETURNING *',
       [username, first_name, last_name, password_hash]
     )
 
-    res.status(201).json(result.rows[0])
+    res.status(201).json('Registration successful')
   } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' })
   }
@@ -160,8 +161,9 @@ export const getUserExpensesByYearMonthId = async (req, res) => {
     const id = req.params.id // Get the id from the request parameters
 
     const result = await db.query(
-      `SELECT expenses.*, categories.name AS category_name FROM expenses 
+      `SELECT expenses.*, categories.name AS category_name, users.username AS owner_username FROM expenses 
        LEFT JOIN categories ON expenses.category_id = categories.id
+       LEFT JOIN users ON expenses.user_id = users.id
        WHERE EXTRACT(YEAR FROM date) = $1 AND EXTRACT(MONTH FROM date) = $2 AND expenses.id = $3`, // Query to fetch expenses for the user for a specific year, month, and id
       [year, month, id]
     )
@@ -343,13 +345,20 @@ export const getUserBalance = async (req, res) => {
         e.total_cost, 
         es.share as balance,
         es.user_id,
-        (e.user_id = $1) as is_own_expense
+        (e.user_id = $1) as is_own_expense,
+        c.name as category_name,
+        e.category_id,
+        u.username as owner_username
       FROM 
         expenses e
       JOIN 
         expense_shares es ON e.id = es.expense_id
+      JOIN
+        categories c ON e.category_id = c.id
+      JOIN
+        users u ON e.user_id = u.id
       WHERE 
-         es.user_id = $1;
+        es.user_id = $1;
     `
 
     const result = await db.query(query, [user_id])
@@ -372,16 +381,16 @@ export const getUserBalance = async (req, res) => {
         if(!(parseInt(share.user_id) === parseInt(user_id))){ // If the logged user is the owner of the share_share
           if (share.balance > 0) { // Credit
             creditBalance += share.balance
-            share.balance = `Credit: ${share.balance}`
+            share.balance = `Credit: €${share.balance}`
           } else { // Refunds to other users
             console.log('Error 1, Other credit or other refund')
           }
         } else {
           if (share.balance < 0) { // Refund received
             debitBalance += share.balance // REFUND, so remove from debit balance
-            share.balance = `Refund Paid: ${-share.balance}`
+            share.balance = `Refund Paid: €${-share.balance}`
           } else { 
-            share.balance = `Own expense: ${share.balance}`
+            share.balance = `Own expense: €${share.balance}`
           }
         }
       } else{
@@ -391,7 +400,7 @@ export const getUserBalance = async (req, res) => {
             share.balance = `Debit: ${share.balance}`
           } else if (share.balance < 0) { // Refund received
             creditBalance += share.balance // REFUND, so remove from credit balance
-            share.balance = `Refund Received: ${-share.balance}`
+            share.balance = `Refund Received: €${-share.balance}`
           }
         } else {
           console.log('Error 2, Other debit or other refund')
@@ -461,10 +470,10 @@ export const getUserBalanceWithId = async (req, res) => {
         if(!(parseInt(share.user_id) === parseInt(logged_user_id))){ // If the logged user is the owner of the share_share
           if (share.balance > 0) { // Credit
             creditBalance += share.balance
-            share.balance = `Credit: ${share.balance}`
+            share.balance = `Credit: €${share.balance}`
           } else { // Refund received
             debitBalance += share.balance // REFUND, so remove from debit balance
-            share.balance = `Refund Paid: ${-share.balance}`
+            share.balance = `Refund Paid: €${-share.balance}`
           }
         } else {
           console.log('Error 1')
@@ -473,10 +482,10 @@ export const getUserBalanceWithId = async (req, res) => {
         if(parseInt(share.user_id) === parseInt(logged_user_id)){
           if (share.balance > 0) {
             debitBalance += share.balance
-            share.balance = `Debit: ${share.balance}`
+            share.balance = `Debit: €${share.balance}`
           } else if (share.balance < 0) { // Refund received
             creditBalance += share.balance // REFUND, so remove from credit balance
-            share.balance = `Refund Received: ${-share.balance}`
+            share.balance = `Refund Received: €${-share.balance}`
           }
         } else {
           console.log('Error 2')
@@ -500,7 +509,8 @@ export const searchExpenses = async (req, res) => {
 
     // Query to search expenses based on the description containing the search query and only for the logged user
     const searchQuery = `
-      SELECT * FROM expenses
+      SELECT expenses.*, categories.name AS category_name FROM expenses
+      LEFT JOIN categories ON expenses.category_id = categories.id
       WHERE description ILIKE $1
       AND user_id = $2;
     `

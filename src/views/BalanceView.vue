@@ -32,6 +32,7 @@
         <thead>
           <tr>
             <th></th>
+            <th class="hidden sm:table-cell">Category</th>
             <th class="hidden sm:table-cell">Owner</th>
             <th>Description</th>
             <th class="hidden sm:table-cell">Date</th>
@@ -39,17 +40,27 @@
             <th>Balance</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="cursor-pointer">
           <tr v-for="(expense, index) in data.expenses" :key="index" @click="goToDetail(expense)">
             <th>{{ index + 1 }}</th>
             <th class="hidden sm:table-cell">
-              {{ expense.user_id }}
+              <div
+                :class="{
+                  'badge badge-neutral w-24': expense.category_id === 1,
+                  'badge badge-primary w-24 text-base-200': expense.category_id !== 1
+                }"
+              >
+                {{ expense.category_name }}
+              </div>
+            </th>
+            <th :class="{ 'text-gray-400': expense.is_own_expense }">
+              @{{ expense.owner_username }}
             </th>
             <td>{{ expense.description }}</td>
             <td class="hidden sm:table-cell">
               {{ new Date(expense.date).toLocaleDateString() }}
             </td>
-            <td>{{ expense.total_cost }}</td>
+            <td class="font-semibold">€{{ expense.total_cost }}</td>
             <td :class="balanceColor(expense.balance)">{{ expense.balance }}</td>
           </tr>
         </tbody>
@@ -75,6 +86,7 @@ onMounted(async () => {
   const balanceData = await getBalance()
   data.value = balanceData
   loading.value = false
+  console.log(data.value)
 })
 
 function balanceColor(balance) {
