@@ -8,6 +8,9 @@
 *.rest
 
 hashpassword.js
+compose-deploy.yaml
+proxy.conf
+rsync-exclude.txt
 
 # Logs
 logs
