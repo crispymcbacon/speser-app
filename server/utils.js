@@ -13,9 +13,6 @@ export async function authenticateToken(req, res, next) {
   try {
     // If the token is valid, extract the user_id from the token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('token',token);
-    console.log('decoded',decoded);
-    console.log('JWT',process.env.JWT_SECRET);
     req.user_id = decoded.user_id;
     next();
   } catch (err) {
