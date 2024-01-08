@@ -44,7 +44,6 @@ Comment all the `// DEVELOPER` in the code to find the places where you need to 
 Uncomment all the `// PRODUCTION` in the code, then:
 
 ```bash
-cd server
 npm install
 npm run build
 
@@ -62,6 +61,9 @@ Uncomment all the `// DEVELOPER` in the code to find the places where you need t
 Comment all the `// PRODUCTION` in the code, then:
 
 ```bash
+npm install
+npm run build
+
 npm run serve
 npm run dev
 ```
