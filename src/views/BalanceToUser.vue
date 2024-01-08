@@ -96,7 +96,7 @@ import { searchUser, getBalanceToUser } from '@/lib/api.js'
 import { useUserStore } from '@/lib/stores.js'
 import { useToast } from 'vue-toastification'
 import { useRouter } from 'vue-router'
-import { IconArrowLeft } from '@tabler/icons-vue'
+import { IconArrowLeft, IconLoader2 } from '@tabler/icons-vue'
 
 const data = ref(null)
 const logged_username = ref('')
@@ -105,6 +105,7 @@ const searchQuery = ref('')
 const toast = useToast()
 const searchResults = ref([]) // new ref for search results
 const router = useRouter()
+const loading = ref(false)
 
 onMounted(() => {
   const userStore = useUserStore()
@@ -152,6 +153,7 @@ const search = async () => {
 
 const selectUser = async (user) => {
   try {
+    loading.value = true
     username.value = user.username // set username to the clicked username
     searchQuery.value = user.username // set searchQuery to the clicked username
     searchResults.value = [] // clear search results
@@ -170,6 +172,7 @@ const selectUser = async (user) => {
       data.value = res
       data.value.totalBalance = balanceLabel(res.totalBalance)
     }
+    loading.value = false
   } catch (error) {
     console.error(error)
     toast.error('An error occurred while selecting the user.', {

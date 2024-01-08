@@ -2,7 +2,6 @@
 /server/public
 .vscode
 .env
-*.md
 /db/password.txt
 /db/data
 *.rest
@@ -11,6 +10,9 @@ hashpassword.js
 compose-deploy.yaml
 proxy.conf
 rsync-exclude.txt
+
+DEPLOY.md
+NOTES.md
 
 # Logs
 logs

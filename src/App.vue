@@ -61,42 +61,42 @@
       <RouterView @login="handleLogin" @logout="handleLogout" />
     </div>
 
-    <div class="fixed inset-x-0 bottom-0 z-10 pb-2 px-8 lg:hidden">
+    <div class="fixed inset-x-0 bottom-0 z-10 pb-3 px-8 lg:hidden">
       <ul
-        class="menu menu-horizontal shadow-md bg-base-200 rounded-box w-full justify-center px-2 py-4 space-x-1"
+        class="menu menu-horizontal shadow-lg bg-base-200 rounded-full w-full justify-center px-2 space-x-1"
       >
         <li v-if="isLoggedIn">
-          <RouterLink active-class="active" to="/">
+          <RouterLink active-class="active " to="/" class="py-3 rounded-full">
             <IconHome :size="24" stroke-width="2" />
           </RouterLink>
         </li>
         <li v-if="isLoggedIn">
-          <RouterLink active-class="active" to="/expenses">
+          <RouterLink active-class="active" to="/expenses" class="py-3 rounded-full">
             <IconReceiptEuro :size="24" stroke-width="2" />
           </RouterLink>
         </li>
         <li v-if="isLoggedIn">
-          <RouterLink active-class="active" to="/addexpense">
+          <RouterLink active-class="active" to="/addexpense" class="py-3 rounded-full">
             <IconCirclePlus :size="24" stroke-width="2" />
           </RouterLink>
         </li>
         <li v-if="isLoggedIn">
-          <RouterLink active-class="active" to="/balance">
+          <RouterLink active-class="active" to="/balance" class="py-3 rounded-full">
             <IconCash :size="24" stroke-width="2" />
           </RouterLink>
         </li>
         <li v-if="!isLoggedIn">
-          <RouterLink active-class="active" to="/signin">
+          <RouterLink active-class="active" to="/signin" class="py-3 rounded-full">
             <IconLogin2 :size="24" stroke-width="2" />
           </RouterLink>
         </li>
         <li v-if="!isLoggedIn">
-          <RouterLink active-class="active" to="/signup">
+          <RouterLink active-class="active" to="/signup" class="py-3 rounded-full">
             <IconUserPlus :size="24" stroke-width="2" />
           </RouterLink>
         </li>
         <li v-if="isLoggedIn">
-          <RouterLink active-class="active" to="/userinfo">
+          <RouterLink active-class="active" to="/userinfo" class="py-3 rounded-full">
             <IconUserSquareRounded :size="24" stroke-width="2" />
           </RouterLink>
         </li>

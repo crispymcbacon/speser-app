@@ -17,7 +17,7 @@
               v-model="firstName"
               type="text"
               id="firstName"
-              placeholder="Mario"
+              placeholder="Luca"
               class="input input-bordered w-full"
             />
           </label>
@@ -35,7 +35,7 @@
               v-model="lastName"
               type="text"
               id="lastName"
-              placeholder="Rossi"
+              placeholder="Bianchi"
               class="input input-bordered w-full"
             />
           </label>

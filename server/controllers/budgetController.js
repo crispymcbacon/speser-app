@@ -375,9 +375,13 @@ export const getUserBalance = async (req, res) => {
           if (share.balance < 0) {
             // Refund received
             debitBalance += share.balance // REFUND, so remove from debit balance
-            share.balance = `Refund Paid: €${-share.balance}`
+            share.balance = `Refund Paid: -€${-share.balance}`
           } else {
-            share.balance = `Own expense: €${share.balance}`
+            // Own expense
+            const total_cost = parseFloat(share.total_cost)
+            creditBalance += total_cost - share.balance // EDIT
+            //share.balance = `Own expense: €${share.balance}`
+            share.balance = `Credit: €${total_cost - share.balance}`
           }
         }
       } else {
@@ -388,7 +392,7 @@ export const getUserBalance = async (req, res) => {
           } else if (share.balance < 0) {
             // Refund received
             creditBalance += share.balance // REFUND, so remove from credit balance
-            share.balance = `Refund Received: €${-share.balance}`
+            share.balance = `Refund Received: -€${-share.balance}`
           }
         } else {
           console.log('Error 2, Other debit or other refund')
@@ -460,7 +464,7 @@ export const getUserBalanceWithId = async (req, res) => {
           } else {
             // Refund received
             debitBalance += share.balance // REFUND, so remove from debit balance
-            share.balance = `Refund Paid: €${-share.balance}`
+            share.balance = `Refund Paid: -€${-share.balance}`
           }
         } else {
           console.log('Error 1') // Error when the logged user is the owner but the user_id is not the logged user
@@ -473,7 +477,7 @@ export const getUserBalanceWithId = async (req, res) => {
           } else if (share.balance < 0) {
             // Refund received
             creditBalance += share.balance // REFUND, so remove from credit balance
-            share.balance = `Refund Received: €${-share.balance}`
+            share.balance = `Refund Received: -€${-share.balance}`
           }
         } else {
           console.log('Error 2') // Error when the logged user is not the owner but the user_id is the logged user

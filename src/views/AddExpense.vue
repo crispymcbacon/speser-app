@@ -204,7 +204,6 @@ onMounted(async () => {
     date.value = today.getFullYear() + '-' + month + '-' + day
 
     categories.value = await getCategories() // Get categories
-    console.log(categories.value)
     categories.value.shift() // Remove the first category (id = 1) from the list, as it is the Refund category
 
     const userExists = users.value.some(
@@ -289,7 +288,6 @@ async function submitForm() {
     total_cost.value,
     description.value
   )
-  console.log(result)
   if (result.status === 'validated') {
     const sumOfShares = users.value.reduce((sum, user) => sum + parseFloat(user.share), 0) // Calculate the sum of all user shares
 

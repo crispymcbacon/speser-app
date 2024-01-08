@@ -280,6 +280,12 @@ watch(isRefund, (newVal) => {
     total_cost.value = 0
     category_id.value = 1 // Set category to Refund
     shareEqually.value = false
+  } else{
+    // Remove the category Refund from categories
+    if (categories.value[0].category_name === 'Refund') {
+        categories.value.shift()
+        category_id.value = ''
+      }
   }
 })
 
@@ -314,7 +320,9 @@ watch(
         newUsers.forEach((user) => (user.share = equalShare)) // Update the share for all users
       }
       // Remove the category Refund from categories
-      categories.value.shift()
+      if (categories.value[0].category_name === 'Refund') {
+        categories.value.shift()
+      }
     }
   },
   { deep: true } // Watch nested properties of objects (users)

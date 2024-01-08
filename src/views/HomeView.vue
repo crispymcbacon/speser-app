@@ -33,7 +33,6 @@
       <p class="py-4">
         You can manage family expenses, share costs with others, track financial balances and
         more.<br />
-        All the functionalities are in the menu at the bottom.
       </p>
     </div>
   </div>
