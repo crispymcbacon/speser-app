@@ -1,8 +1,8 @@
 import pkg from 'pg';
 const { Pool } = pkg; 
 
-//import dotenv from 'dotenv'; // DEVELOPMENT ONLY
-//dotenv.config(); // DEVELOPMENT ONLY
+//import dotenv from 'dotenv'; // DEVELOPMENT
+//dotenv.config(); // DEVELOPMENT
 
 // Create a new connection pool using the set credentials and parameters
 const pool = new Pool({
