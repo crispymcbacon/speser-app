@@ -14,7 +14,7 @@ rsync-exclude.txt
 
 DEPLOY.md
 NOTES.md
-PRESENTATION.md
+#PRESENTATION.md
 
 # Logs
 logs
