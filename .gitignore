@@ -1,8 +1,8 @@
 # Personal
-/server/public
+#/server/public
 .vscode
 .env
-/db/password.txt
+#/db/password.txt
 /db/data
 *.rest
 *.sh
