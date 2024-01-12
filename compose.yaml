@@ -13,8 +13,8 @@ services:
       - DB_DATABASE=family_db
       - DB_PORT=5432
       - DB_SSL=false
-      - DB_PASSWORD=TVy7PXQ3
-      - JWT_SECRET=f21f34146de71fa0eba5cbaacaaf1a5b87040d99e04f1dc037c1e08db24ac39d07bec65cccdb42d0875acf77fab9b5910c5e8c3cdc5d4a58ff5db91a2b24556a
+      - DB_PASSWORD=<password>
+      - JWT_SECRET=<secret>
   db:
     container_name: db-campagnolo
     image: postgres
