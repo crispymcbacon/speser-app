@@ -51,13 +51,6 @@ npm run build
 mv dist server/public
 npm run serve
 ```
-
-On `compose.yml` file, comment all the `app` service and start the database with:
-
-```bash
-docker compose up
-```
-
 Access the application at http://localhost:3000
 
 ### Via Vue + Express
@@ -73,12 +66,6 @@ npm run build
 
 npm run serve
 npm run dev
-```
-
-On `compose.yml` file, comment all the `app` service and start the database with:
-
-```bash
-docker compose up
 ```
 
 Access the application at http://localhost:5173

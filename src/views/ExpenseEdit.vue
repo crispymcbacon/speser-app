@@ -343,8 +343,7 @@ async function submitForm() {
     description.value
   )
   if (result.status === 'validated') {
-    let sumOfShares = users.value.reduce((sum, user) => sum + parseFloat(user.share), 0) // Calculate the sum of all user shares
-    sumOfShares.toFixed(2) // Round to 2 decimal places
+    const sumOfShares = users.value.reduce((sum, user) => sum + parseFloat(user.share), 0) // Calculate the sum of all user shares
 
     const epsilon = 0.01 // Define an acceptable error margin (es. case 3.333)
     if (Math.abs(sumOfShares - parseFloat(total_cost.value)) > epsilon) {

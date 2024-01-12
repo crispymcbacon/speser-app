@@ -203,8 +203,7 @@ export const addUserExpense = async (req, res) => {
 
     if (users && users.length > 0) {
       // If users are provided
-      let totalShares = users.reduce((sum, user) => sum + parseFloat(user.share), 0) // Calculate the sum of all shares
-      totalShares = totalShares.toFixed(2) // Convert to string with 2 decimal places
+      const totalShares = users.reduce((sum, user) => sum + parseFloat(user.share), 0) // Calculate the sum of all shares
 
       const epsilon = 0.01 // Define an acceptable error margin
       if (Math.abs(totalShares - parseFloat(total_cost)) > epsilon) {
@@ -255,8 +254,7 @@ export const updateUserExpense = async (req, res) => {
 
     if (users && users.length > 0) {
       // If users are provided
-      let totalShares = users.reduce((sum, user) => sum + parseFloat(user.share), 0) // Calculate the sum of all shares
-      totalShares = totalShares.toFixed(2) // Convert to string with 2 decimal places
+      const totalShares = users.reduce((sum, user) => sum + parseFloat(user.share), 0) // Calculate the sum of all shares
 
       const epsilon = 0.01 // Define an acceptable error margin
       if (Math.abs(totalShares - parseFloat(total_cost)) > epsilon) {

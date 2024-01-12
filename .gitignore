@@ -5,7 +5,6 @@
 #/db/password.txt
 /db/data
 *.rest
-*.sh
 
 hashpassword.js
 compose-deploy.yaml
@@ -14,7 +13,7 @@ rsync-exclude.txt
 
 DEPLOY.md
 NOTES.md
-#PRESENTATION.md
+PRESENTATION.md
 
 # Logs
 logs
